@@ -28,8 +28,8 @@ Developed for petroleum engineering applications focused on
 machine learning-based modeling of crude oil physical-chemical
 properties.
 
-Author: TeixeiraWILLIAN
-Repository: [GitHub Project Link]
+Author: Willian Teixeira
+Repository: https://github.com/TeixeiraWILLIAN/DeepLearning
 Python Version: 3.10+
 Dependencies: TensorFlow, NumPy, Pandas, Optuna, Scikit-learn, Matplotlib, SciPy, Joblib, JSON, Argparse
 =======================================================================

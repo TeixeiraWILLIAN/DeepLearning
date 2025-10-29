@@ -22,8 +22,8 @@ Structure:
 Developed for petroleum engineering applications focused on
 machine learning-based property estimation.
 
-Author: TeixeiraWILLAIN
-Repository: [GitHub Project Link]
+Author: Willian Teixeira
+Repository: https://github.com/TeixeiraWILLIAN/DeepLearning
 Python Version: 3.10+
 Dependencies: TensorFlow, NumPy, joblib, json, os
 ===============================================================
