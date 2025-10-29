@@ -38,7 +38,11 @@ Dependencies: TensorFlow, NumPy, Pandas, Optuna, Scikit-learn, Matplotlib, SciPy
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-import os, json, joblib, argparse, optuna
+import os
+import json
+import joblib
+import argparse
+import optuna
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split, KFold
 from sklearn.preprocessing import StandardScaler, RobustScaler
@@ -53,15 +57,18 @@ SEMENTE = 42
 tf.keras.utils.set_random_seed(SEMENTE)
 np.random.seed(SEMENTE)
 
-# CONFIGURAÇÃO PRINCIPAL
-COLUNAS = ["Density", "Pour_Point", "Wax", "Asphaltene", "Viscosity_20C", "Viscosity_50C"]
+# MAIN CONFIGURATION
+COLUNAS = ["Density", "Pour_Point", "Wax",
+           "Asphaltene", "Viscosity_20C", "Viscosity_50C"]
 VARIAVEL = "Wax"
 FOLDS = 5
 TENTATIVAS = 500
 
-# FUNÇÃO PARA CONVERTER TIPOS NUMPY PARA TIPOS PYTHON NATIVOS
+# FUNCTION TO CONVERT NUMPY TYPES TO NATIVE PYTHON TYPES
+
+
 def converter_para_json_serializavel(obj):
-    """Converte tipos NumPy e outros tipos não serializáveis para tipos Python nativos"""
+    """Converts NumPy types and other non-serializable types to native Python types"""
     if isinstance(obj, dict):
         return {k: converter_para_json_serializavel(v) for k, v in obj.items()}
     elif isinstance(obj, list):
@@ -81,18 +88,23 @@ def converter_para_json_serializavel(obj):
     else:
         return obj
 
-# FUNÇÕES AUXILIARES
+# Auxiliary Functions
+
+
 def detectar_valores_atipicos(X, y, contaminacao=0.1):
     """Detecta valores atípicos usando Isolation Forest"""
     dados = np.column_stack([X, y.reshape(-1, 1)])
-    detector = IsolationForest(contamination=contaminacao, random_state=SEMENTE)
+    detector = IsolationForest(
+        contamination=contaminacao, random_state=SEMENTE)
     rotulos_atipicos = detector.fit_predict(dados)
     return rotulos_atipicos == -1
 
+
 def tratar_multicolinearidade(X, nomes_variaveis, limite=0.95):
-    """Remove variáveis altamente correlacionadas"""
+    """Remove highly correlated variables"""
     matriz_correlacao = np.corrcoef(X.T)
-    pares_alta_correlacao = np.where((np.abs(matriz_correlacao) > limite) & (matriz_correlacao != 1))
+    pares_alta_correlacao = np.where(
+        (np.abs(matriz_correlacao) > limite) & (matriz_correlacao != 1))
 
     para_remover = set()
     for i, j in zip(pares_alta_correlacao[0], pares_alta_correlacao[1]):
@@ -100,16 +112,20 @@ def tratar_multicolinearidade(X, nomes_variaveis, limite=0.95):
             para_remover.add(j)
 
     if para_remover:
-        print(f"Removendo variáveis correlacionadas: {[nomes_variaveis[i] for i in para_remover]}")
+        print(
+            f"Removendo variáveis correlacionadas: {[nomes_variaveis[i] for i in para_remover]}")
         X_filtrado = np.delete(X, list(para_remover), axis=1)
-        nomes_filtrados = [nome for i, nome in enumerate(nomes_variaveis) if i not in para_remover]
+        nomes_filtrados = [nome for i, nome in enumerate(
+            nomes_variaveis) if i not in para_remover]
         return X_filtrado, nomes_filtrados, list(para_remover)
 
     return X, nomes_variaveis, []
 
-# CARREGAMENTO DE DADOS
+# DATA LOADING
+
+
 def carregar_dados(caminho, alvo):
-    """Carrega e preprocessa os dados"""
+    """Loads and preprocesses the data"""
     if not os.path.exists(caminho):
         raise FileNotFoundError(f"Arquivo não encontrado: {caminho}")
 
@@ -129,7 +145,8 @@ def carregar_dados(caminho, alvo):
             .dropna()
         )
     except Exception as e:
-        raise ValueError(f"Erro ao carregar dados do arquivo {caminho}: {str(e)}")
+        raise ValueError(
+            f"Erro ao carregar dados do arquivo {caminho}: {str(e)}")
 
     if df.empty:
         raise ValueError("Dataset vazio após limpeza dos dados")
@@ -140,38 +157,44 @@ def carregar_dados(caminho, alvo):
     X = df[colunas_caracteristicas].values
     y = df[[alvo]].values
 
-    # Retorna valores vazios para variaveis_removidas e mascara_atipicos, como no TUNING.py quando comentados
+    # Returns empty values ​​for removed_variables and atypical_masks, as in TUNING.py when commented out.
     return X, y, colunas_caracteristicas, [], None
 
-# FUNÇÃO OBJETIVO PARA OPTUNA
-def construir_modelo(tentativa, dimensao_entrada):
-    """Constrói modelo com espaço de busca expandido"""
-    modelo = tf.keras.Sequential([tf.keras.layers.Input(shape=(dimensao_entrada,))])
+# OBJECTIVE FUNCTION FOR OPTUNA
 
-    # Número variável de camadas (expandido)
+
+def construir_modelo(tentativa, dimensao_entrada):
+    """Builds model with expanded search space"""
+    modelo = tf.keras.Sequential(
+        [tf.keras.layers.Input(shape=(dimensao_entrada,))])
+
+    # Variable number of layers (expanded)
     num_camadas = tentativa.suggest_int("num_camadas", 2, 4)
 
     for i in range(num_camadas):
-        # Unidades por camada
-        unidades = tentativa.suggest_categorical(f"unidades_{i}", [32, 64, 128, 256, 512])
+        # Units per layer
+        unidades = tentativa.suggest_categorical(
+            f"unidades_{i}", [32, 64, 128, 256, 512])
 
-        # Função de ativação
-        ativacao = tentativa.suggest_categorical(f"ativacao_{i}", ['relu', 'tanh', 'leaky_relu'])
+        # Activation function
+        ativacao = tentativa.suggest_categorical(
+            f"ativacao_{i}", ['relu', 'tanh', 'leaky_relu'])
 
         # Dropout
         dropout = tentativa.suggest_float(f"dropout_{i}", 0.0, 0.5)
 
-        # Normalização em Lote
-        usar_batch_norm = tentativa.suggest_categorical(f"batch_norm_{i}", [True, False])
+        # Batch Normalization
+        usar_batch_norm = tentativa.suggest_categorical(
+            f"batch_norm_{i}", [True, False])
 
-        # Adiciona camada densa
+        # Add dense layer
         modelo.add(tf.keras.layers.Dense(unidades, activation=None))
 
-        # Normalização em Lote (se selecionado)
+        # Batch Normalization (if selected)
         if usar_batch_norm:
             modelo.add(tf.keras.layers.BatchNormalization())
 
-        # Ativação
+        # Activation
         if ativacao == "leaky_relu":
             modelo.add(tf.keras.layers.LeakyReLU())
         else:
@@ -181,36 +204,41 @@ def construir_modelo(tentativa, dimensao_entrada):
         if dropout > 0:
             modelo.add(tf.keras.layers.Dropout(dropout))
 
-    # Regularização L1/L2
+    # Regularization L1/L2
     reg_l1 = tentativa.suggest_float("reg_l1", 1e-6, 1e-2, log=True)
     reg_l2 = tentativa.suggest_float("reg_l2", 1e-6, 1e-2, log=True)
 
-    # Camada de saída
+    # Output layer
     modelo.add(tf.keras.layers.Dense(1, activation="linear",
                                      kernel_regularizer=tf.keras.regularizers.L1L2(l1=reg_l1, l2=reg_l2)))
 
-    # Otimizador e taxa de aprendizado
-    nome_otimizador = tentativa.suggest_categorical("otimizador", ["adam", "sgd", "rmsprop"])
-    taxa_aprendizado = tentativa.suggest_float("taxa_aprendizado", 1e-4, 1e-1, log=True)
+    # Optimizer and learning rate
+    nome_otimizador = tentativa.suggest_categorical(
+        "otimizador", ["adam", "sgd", "rmsprop"])
+    taxa_aprendizado = tentativa.suggest_float(
+        "taxa_aprendizado", 1e-4, 1e-1, log=True)
 
     if nome_otimizador == "adam":
         otimizador = tf.keras.optimizers.Adam(learning_rate=taxa_aprendizado)
     elif nome_otimizador == "sgd":
         otimizador = tf.keras.optimizers.SGD(learning_rate=taxa_aprendizado)
     else:
-        otimizador = tf.keras.optimizers.RMSprop(learning_rate=taxa_aprendizado)
+        otimizador = tf.keras.optimizers.RMSprop(
+            learning_rate=taxa_aprendizado)
 
     modelo.compile(optimizer=otimizador, loss="mse", metrics=["mae"])
     return modelo
 
+
 def funcao_objetivo(tentativa, X, y):
-    """Função objetivo melhorada com validação cruzada aninhada"""
+    """Improved objective function with nested cross-validation"""
     kf = KFold(n_splits=FOLDS, shuffle=True, random_state=SEMENTE)
-    tamanho_lote = tentativa.suggest_categorical("tamanho_lote", [8, 16, 32, 64])
+    tamanho_lote = tentativa.suggest_categorical(
+        "tamanho_lote", [8, 16, 32, 64])
 
     perdas_validacao = []
     for indices_treino, indices_val in kf.split(X):
-        # Usar RobustScaler para ser menos sensível a valores atípicos
+        # Use RobustScaler to be less sensitive to outliers
         normalizador_x, normalizador_y = RobustScaler(), StandardScaler()
         X_treino = normalizador_x.fit_transform(X[indices_treino])
         X_val = normalizador_x.transform(X[indices_val])
@@ -219,10 +247,12 @@ def funcao_objetivo(tentativa, X, y):
 
         modelo = construir_modelo(tentativa, X.shape[1])
 
-        # Callbacks para Optuna (Validação Cruzada)
+        # Callbacks for Optuna (Cross-Validation)
         callbacks = [
-            tf.keras.callbacks.EarlyStopping("val_loss", patience=20, restore_best_weights=True, verbose=0),
-            tf.keras.callbacks.ReduceLROnPlateau("val_loss", patience=10, factor=0.5, verbose=0)
+            tf.keras.callbacks.EarlyStopping(
+                "val_loss", patience=20, restore_best_weights=True, verbose=0),
+            tf.keras.callbacks.ReduceLROnPlateau(
+                "val_loss", patience=10, factor=0.5, verbose=0)
         ]
 
         modelo.fit(
@@ -235,19 +265,21 @@ def funcao_objetivo(tentativa, X, y):
         )
 
         resultado_avaliacao = modelo.evaluate(X_val, y_val, verbose=0)
-        perda_val = resultado_avaliacao[0] if isinstance(resultado_avaliacao, list) else resultado_avaliacao
+        perda_val = resultado_avaliacao[0] if isinstance(
+            resultado_avaliacao, list) else resultado_avaliacao
         perdas_validacao.append(perda_val)
 
     return float(np.mean(perdas_validacao))
 
+
 def avaliacao_abrangente(y_verdadeiro, y_predito):
-    """Avaliação abrangente do modelo (incluindo correção MAPE)"""
+    """Comprehensive model evaluation (including MAPE correction)"""
     mse = mean_squared_error(y_verdadeiro, y_predito)
     rmse = np.sqrt(mse)
     mae = mean_absolute_error(y_verdadeiro, y_predito)
     r2 = r2_score(y_verdadeiro, y_predito)
 
-    # Correção MAPE: evitar divisão por zero
+    # MAPE Correction: Avoid division by zero
     mask_nao_zero = y_verdadeiro.flatten() != 0
     if np.any(mask_nao_zero):
         y_true_nz = y_verdadeiro.flatten()[mask_nao_zero]
@@ -258,12 +290,12 @@ def avaliacao_abrangente(y_verdadeiro, y_predito):
 
     erro_maximo = np.max(np.abs(y_verdadeiro - y_predito))
 
-    # Análise de resíduos
+    # Waste analysis
     residuos = y_verdadeiro.flatten() - y_predito.flatten()
     media_residuos = np.mean(residuos)
     desvio_residuos = np.std(residuos)
 
-    # Teste de normalidade
+    # Normality test
     if len(residuos) >= 3:
         try:
             estatistica_shapiro, p_shapiro = stats.shapiro(residuos)
@@ -282,24 +314,28 @@ def avaliacao_abrangente(y_verdadeiro, y_predito):
         'residuos_normais': residuos_normais
     }
 
-# PIPELINE DE TUNING E TREINAMENTO FINAL MELHORADO
+# TUNING PIPELINE AND FINAL TRAINING
+
+
 def executar_tuning(
         alvo,
         dados="propriedades_oleo_SINTEF_final.xlsx",
         tentativas=TENTATIVAS,
         pasta_saida="Tuning_Results"
 ):
-    """Pipeline completo de tuning e avaliação"""
+    """Complete tuning and evaluation pipeline"""
     print(f"INICIANDO TUNING PARA {alvo}")
 
-    # Carrega e preprocessa dados
-    X, y, nomes_caracteristicas, variaveis_removidas, mascara_atipicos = carregar_dados(dados, alvo)
+    # Loads and preprocesses data
+    X, y, nomes_caracteristicas, variaveis_removidas, mascara_atipicos = carregar_dados(
+        dados, alvo)
 
     print(f"Variáveis utilizadas: {nomes_caracteristicas}")
     if variaveis_removidas:
-        print(f"Variáveis removidas por multicolinearidade: {variaveis_removidas}")
+        print(
+            f"Variáveis removidas por multicolinearidade: {variaveis_removidas}")
 
-    # Divisão estratificada dos dados
+    # Stratified division of data
     X_desenvolvimento, X_teste, y_desenvolvimento, y_teste = train_test_split(
         X, y, test_size=0.09, random_state=SEMENTE
     )
@@ -307,11 +343,12 @@ def executar_tuning(
     print(f"Desenvolvimento: {len(X_desenvolvimento)} amostras")
     print(f"Teste: {len(X_teste)} amostras")
 
-    # Estudo Optuna com configurações melhoradas
+    # Optuna Study
     estudo = optuna.create_study(
         direction="minimize",
         sampler=optuna.samplers.TPESampler(seed=SEMENTE, n_startup_trials=20),
-        pruner=optuna.pruners.MedianPruner(n_startup_trials=10, n_warmup_steps=20)
+        pruner=optuna.pruners.MedianPruner(
+            n_startup_trials=10, n_warmup_steps=20)
     )
 
     print(f"Iniciando otimização com {tentativas} tentativas...")
@@ -324,14 +361,15 @@ def executar_tuning(
         print(f"  {chave}: {valor}")
     print(f"Melhor pontuação de validação: {estudo.best_value:.6f}")
 
-    # Treinamento final com hold-out
+    # Final training with hold-out
     print(f"\nTREINAMENTO FINAL")
     normalizador_x, normalizador_y = RobustScaler(), StandardScaler()
     X_dev_norm = normalizador_x.fit_transform(X_desenvolvimento)
     X_teste_norm = normalizador_x.transform(X_teste)
     y_dev_norm = normalizador_y.fit_transform(y_desenvolvimento)
 
-    # Classe auxiliar para construir o modelo com os melhores parâmetros fixos
+    # Auxiliary class for building the model with the best fixed parameters
+
     class TrialFixo:
         def __init__(self, params):
             self.params = params
@@ -347,27 +385,29 @@ def executar_tuning(
 
     modelo_final = construir_modelo(TrialFixo(melhores_parametros), X.shape[1])
 
-    # Callbacks para treinamento final (monitorando 'loss' e com patience do TUNING.py original)
+    # Callbacks for final training (monitoring 'loss' and using the patience function from the original TUNING.py)
     callbacks_finais = [
-        tf.keras.callbacks.EarlyStopping("loss", patience=25, restore_best_weights=True, verbose=1),
-        tf.keras.callbacks.ReduceLROnPlateau("loss", patience=15, factor=0.5, verbose=1)
+        tf.keras.callbacks.EarlyStopping(
+            "loss", patience=25, restore_best_weights=True, verbose=1),
+        tf.keras.callbacks.ReduceLROnPlateau(
+            "loss", patience=15, factor=0.5, verbose=1)
     ]
 
-    # Treinamento final no conjunto de desenvolvimento completo (SEM validation_split)
+    # Final training in the complete development suite (without validation_split)
     historico = modelo_final.fit(
         X_dev_norm, y_dev_norm,
-        epochs=1000, # Mantemos um número alto, pois o EarlyStopping vai parar
+        epochs=1000,
         batch_size=melhores_parametros.get("tamanho_lote", 32),
         callbacks=callbacks_finais,
         verbose=1
     )
 
-    # Avaliação no conjunto de teste
+    # Evaluation in the test set
     print(f"\nAVALIAÇÃO FINAL")
     y_pred_norm = modelo_final.predict(X_teste_norm, verbose=0)
     y_pred = normalizador_y.inverse_transform(y_pred_norm)
 
-    # Usamos a função de avaliação abrangente com a correção MAPE
+    # We use the comprehensive assessment function with MAPE correction.
     metricas_teste = avaliacao_abrangente(y_teste, y_pred)
 
     print("Métricas no conjunto de teste:")
@@ -378,11 +418,11 @@ def executar_tuning(
     print(f"  MAPE: {metricas_teste['mape']:.2f}%")
     print(f"  Resíduos normais: {metricas_teste['residuos_normais']}")
 
-    # Salva artefatos
+    # Save artifacts
     caminho = os.path.join(pasta_saida, alvo)
     os.makedirs(caminho, exist_ok=True)
 
-    # Configurações e resultados
+    # Settings and results
     resultados = {
         "melhores_parametros": melhores_parametros,
         "melhor_pontuacao_validacao": float(estudo.best_value) if estudo.best_value is not None else None,
@@ -399,13 +439,13 @@ def executar_tuning(
         }
     }
 
-    # CORREÇÃO: Converter para tipos serializáveis em JSON
+    # CORRECTION: Convert to JSON serializable types
     resultados = converter_para_json_serializavel(resultados)
 
     with open(os.path.join(caminho, "resultados_tuning.json"), "w") as fp:
         json.dump(resultados, fp, indent=2)
 
-    # Histórico de treinamento
+    # Training history
     historico_serializavel = {}
     for chave, valor in historico.history.items():
         historico_serializavel[chave] = [float(v) for v in valor]
@@ -413,24 +453,24 @@ def executar_tuning(
     with open(os.path.join(caminho, "historico_treinamento.json"), "w") as fp:
         json.dump(historico_serializavel, fp, indent=2)
 
-    # Salva colunas de entrada
+    # Save input columns
     with open(os.path.join(caminho, "colunas_entrada.json"), "w") as fp:
         json.dump(nomes_caracteristicas, fp, indent=2)
 
-    # Estudo Optuna
+    # Optuna Study
     joblib.dump(estudo, os.path.join(caminho, "estudo_optuna.pkl"))
 
     print(f"\nArtefatos salvos em: {caminho}")
 
-    # Gráficos de análise (código omitido por brevidade, mas deve ser mantido)
-    # ...
+    # Analysis charts (code omitted for brevity, but should be kept)
 
     return resultados
 
 
-# PRINCIPAL
+# MAIN
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser(description="Tuning avançado de hiperparâmetros para RNA")
+    ap = argparse.ArgumentParser(
+        description="Tuning avançado de hiperparâmetros para RNA")
     ap.add_argument("--var", default=VARIAVEL, choices=COLUNAS,
                     help="Propriedade a ser predita")
     ap.add_argument("--tentativas", type=int, default=TENTATIVAS,

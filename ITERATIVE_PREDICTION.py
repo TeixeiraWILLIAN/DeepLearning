@@ -36,9 +36,7 @@ import numpy as np
 import tensorflow as tf
 from pathlib import Path
 
-# ============================================
-# CONFIGURAÇÕES
-# ============================================
+# SETTINGS
 PROPRIEDADES = ['Density', 'Pour_Point', 'Wax',
                 'Asphaltene', 'Viscosity_20C', 'Viscosity_50C']
 UNIDADES = {
@@ -70,20 +68,18 @@ DESEMPENHO_MODELOS = {
 
 MODELS_FOLDER = 'Results_model'
 
-# ============================================
-# FUNÇÕES
-# ============================================
 
+# FUNÇÕES
 
 def limpar_tela():
-    """Limpa a tela do console"""
+    """Clears the console screen"""
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
 def exibir_header():
-    """Exibe o cabeçalho da aplicação"""
+    """Displays the application header"""
     print("=" * 70)
-    # Cores ANSI
+    # ANSI Colors
     print(
         "\033[95m" + "PREDIÇÃO DE PROPRIEDADES DO PETRÓLEO BRUTO".center(70) + "\033[0m")
     print("=" * 70)
@@ -91,31 +87,31 @@ def exibir_header():
 
 
 def exibir_menu_propriedades():
-    """Exibe menu de seleção de propriedades"""
+    """Displays properties selection menu"""
     print("Selecione a propriedade que deseja PREDIZER:\n")
-    
+
     for i, prop in enumerate(PROPRIEDADES, 1):
         r2 = DESEMPENHO_MODELOS[prop]
-        
-        # Define cor e status
+
+        # Define color and status
         if r2 > 0.90:
-            cor = "\033[92m"  # Verde
+            cor = "\033[92m"  # Green
             status = "Alta Confiabilidade"
         elif r2 > 0.50:
-            cor = "\033[93m"  # Amarelo
+            cor = "\033[93m"  # Yellow
             status = "Moderada Confiabilidade"
         else:
-            cor = "\033[91m"  # Vermelho
+            cor = "\033[91m"  # Red
             status = "Baixa Confiabilidade"
-        
+
         reset = "\033[0m"
         print(f"  {i}. {prop:20} (R² = {r2:7.2f}) {cor}{status}{reset}")
-    
+
     print()
-    
+
 
 def obter_propriedade_alvo():
-    """Obtém a propriedade alvo do usuário"""
+    """Gets the target property from the user"""
     while True:
         exibir_menu_propriedades()
         try:
@@ -130,7 +126,7 @@ def obter_propriedade_alvo():
 
 
 def carregar_modelo(propriedade):
-    """Carrega o modelo treinado para uma propriedade"""
+    """Loads the trained model to a property"""
     pasta = os.path.join(MODELS_FOLDER, propriedade)
 
     try:
@@ -141,13 +137,13 @@ def carregar_modelo(propriedade):
             pasta, f'{propriedade}_normalizador_y.pkl')
         colunas_path = os.path.join(pasta, 'colunas_entrada.json')
 
-        # Verificar se todos os arquivos existem
+        # Check if all files exist
         if not all(os.path.exists(p) for p in [modelo_path, scaler_x_path, scaler_y_path, colunas_path]):
             print(
                 f"Erro: Arquivos do modelo para '{propriedade}' não encontrados em {pasta}")
             return None, None, None, None
 
-        # Carregar arquivos
+        # Upload files
         modelo = tf.keras.models.load_model(modelo_path)
         scaler_x = joblib.load(scaler_x_path)
         scaler_y = joblib.load(scaler_y_path)
@@ -163,7 +159,7 @@ def carregar_modelo(propriedade):
 
 
 def obter_valores_entrada(colunas_esperadas):
-    """Obtém os valores de entrada do usuário"""
+    """Retrieves user input values"""
     valores = {}
 
     print("\n" + "=" * 70)
@@ -189,15 +185,15 @@ def obter_valores_entrada(colunas_esperadas):
 
 
 def fazer_predicao(modelo, scaler_x, scaler_y, valores_entrada, colunas_esperadas):
-    """Faz a predição"""
+    """Make the prediction"""
     try:
-        # Preparar dados na ordem correta
+        # Prepare data in the correct order.
         X = np.array([[valores_entrada[col] for col in colunas_esperadas]])
 
-        # Normalizar
+        # Normalize
         X_norm = scaler_x.transform(X)
 
-        # Predizer
+        # Predict
         y_pred_norm = modelo.predict(X_norm, verbose=0)
         y_pred = scaler_y.inverse_transform(y_pred_norm)
 
@@ -208,19 +204,19 @@ def fazer_predicao(modelo, scaler_x, scaler_y, valores_entrada, colunas_esperada
 
 
 def exibir_resultado(propriedade_alvo, predicao, valores_entrada, r2):
-    """Exibe o resultado da predição"""
+    """Displays the prediction result"""
     print("\n" + "=" * 70)
     print("\033[95m" + "RESULTADO DA PREDIÇÃO".center(70) + "\033[0m")
     print("=" * 70)
     print()
 
-    # Resultado principal
+    # Main result
     unidade = UNIDADES[propriedade_alvo]
     print(f"Propriedade a Predizer: \033[91m {propriedade_alvo} \033[0m")
     print(f"Valor Predito: \033[91m{predicao:.4f} {unidade} \033[0m")
     print()
 
-    # Desempenho do modelo
+    # Model performance
     if r2 > 0.90:
         status = "Altamente Confiável"
         confianca = "Alta"
@@ -236,7 +232,7 @@ def exibir_resultado(propriedade_alvo, predicao, valores_entrada, r2):
     print(f"Confiança Estimada: {confianca}")
     print()
 
-    # Valores de entrada utilizados
+    # Input values ​​used
     print("Valores de Entrada Utilizados:")
     print("-" * 70)
     for prop, valor in valores_entrada.items():
@@ -246,7 +242,7 @@ def exibir_resultado(propriedade_alvo, predicao, valores_entrada, r2):
 
 
 def perguntar_continuar():
-    """Pergunta se o usuário deseja fazer outra predição"""
+    """Asks the user if they want to make another prediction"""
     while True:
         resposta = input(
             "Deseja fazer outra predição? (s/n): ").strip().lower()
@@ -257,17 +253,15 @@ def perguntar_continuar():
         else:
             print("Digite 's' para sim ou 'n' para não.\n")
 
-# ============================================
-# PROGRAMA PRINCIPAL
-# ============================================
 
+# PROGRAMA PRINCIPAL
 
 def main():
-    """Função principal"""
+    """Main function"""
     limpar_tela()
     exibir_header()
 
-    # Verificar se a pasta de modelos existe
+    # Check if the templates folder exists
     if not os.path.exists(MODELS_FOLDER):
         print(f"Erro: Pasta '{MODELS_FOLDER}' não encontrada!")
         print(
@@ -276,13 +270,13 @@ def main():
         return
 
     while True:
-        # Obter propriedade alvo
+        # Get target property
         propriedade_alvo = obter_propriedade_alvo()
 
         print(f"\nVocê selecionou: \033[91m {propriedade_alvo} \033[0m")
         print("\033[93m" + "Carregando modelo..." + "\033[0m")
 
-        # Carregar modelo
+        # Load template
         modelo, scaler_x, scaler_y, colunas_entrada = carregar_modelo(
             propriedade_alvo)
 
@@ -292,28 +286,28 @@ def main():
             exibir_header()
             continue
 
-        # Obter colunas de entrada (propriedades que não estão sendo preditas)
+        # Get input columns (properties that are not being predicted)
         colunas_entrada_esperadas = [
             col for col in colunas_entrada if col != propriedade_alvo]
 
         print("\033[32m" + "Modelo carregado com sucesso!\n" + "\033[0m")
 
-        # Obter valores de entrada
+        # Get input values
         valores_entrada = obter_valores_entrada(colunas_entrada_esperadas)
 
-        # Fazer predição
+        # Make prediction
         print("\033[93m" + "\nProcessando predição..." + "\033[0m")
         predicao = fazer_predicao(
             modelo, scaler_x, scaler_y, valores_entrada, colunas_entrada_esperadas)
 
         if predicao is not None:
-            # Obter R² do modelo
+            # Get the R² of the model
             r2 = DESEMPENHO_MODELOS[propriedade_alvo]
 
-            # Exibir resultado
+            # Display result
             exibir_resultado(propriedade_alvo, predicao, valores_entrada, r2)
 
-        # Perguntar se deseja continuar
+        # Ask if they wish to continue.
         if not perguntar_continuar():
             print("\nObrigado por usar a aplicação!")
             break

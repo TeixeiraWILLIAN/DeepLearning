@@ -54,8 +54,7 @@ SEMENTE = 42
 tf.keras.utils.set_random_seed(SEMENTE)
 np.random.seed(SEMENTE)
 
-# ============================================
-# CONFIGURAÇÕES PREDEFINIDAS (por propriedade)
+# DEFAULT SETTINGS (by property)
 # ============================================
 configuracoes_predefinidas = {
     'Density': dict(
@@ -115,15 +114,11 @@ configuracoes_predefinidas = {
     )
 }
 
-# ==========================
-# CONFIGURAÇÃO PRINCIPAL
-# ==========================
+# MAIN CONFIGURATION
 COLUNAS = ["Density", "Pour_Point", "Wax", "Asphaltene", "Viscosity_20C", "Viscosity_50C"]
 VARIAVEL = "Viscosity_50C"
 
-# ==========================
-# Utilidades
-# ==========================
+# Utilities
 def converter_para_json_serializavel(obj):
     if isinstance(obj, dict):
         return {k: converter_para_json_serializavel(v) for k, v in obj.items()}
@@ -143,11 +138,11 @@ def converter_para_json_serializavel(obj):
         return obj
 
 def detectar_valores_atipicos(X, y, contaminacao=0.1):
-    # Não usado neste script, mas mantido para compatibilidade de assinatura se necessário
+    # Not used in this script, but kept for signature compatibility if needed.
     return np.zeros(len(X), dtype=bool)
 
 def tratar_multicolinearidade(X, nomes_variaveis, limite=0.95):
-    # Não usado neste script, mas mantido para compatibilidade de assinatura se necessário
+    # Not used in this script, but kept for signature compatibility if needed.
     return X, nomes_variaveis, []
 
 def carregar_dados(caminho, alvo):
@@ -180,34 +175,30 @@ def carregar_dados(caminho, alvo):
     X = df[colunas_caracteristicas].values
     y = df[[alvo]].values
 
-    # Retorna valores vazios para variaveis_removidas e mascara_atipicos, como no TUNING.py quando comentados
+    # Returns empty values ​​for removed_variables and atypical_masks, as in TUNING.py when commented out.
     return X, y, colunas_caracteristicas, [], None
 
-# ==========================
-# Obtém a configuração para a variável alvo
-# ==========================
+# Gets the configuration for the target variable
 def obter_configuracao(alvo):
     """
-    Pega a configuração da variável alvo no formato novo (camadas=[(...), ...]).
+    Retrieves the target variable configuration in the new format (layers=[(...), ...]).
     """
     if alvo in configuracoes_predefinidas:
         return configuracoes_predefinidas[alvo]
     else:
         raise ValueError(f"Configuração predefinida não encontrada para a variável alvo: {alvo}")
 
-# ==========================
-# Construtor do modelo com parâmetros fixos
-# ==========================
+# Model builder with fixed parameters
 def construir_modelo_otimizado(params, dimensao_entrada):
     """
-    Constrói o modelo da rede neural com base nos parâmetros fornecidos.
-    Espera o formato: params["camadas"] = [(units, ativ, dropout), ...]
+    Builds the neural network model based on the provided parameters.
+    Expects the format: params["layers"] = [(units, ativ, dropout), ...]
     """
     modelo = tf.keras.Sequential([tf.keras.layers.Input(shape=(dimensao_entrada,))])
 
     for camada in params["camadas"]:
-        unidades, ativacao, dropout = camada[:3] # Pega os 3 primeiros elementos (unidades, ativacao, dropout)
-        usar_batch_norm = camada[3] if len(camada) > 3 else False # Verifica se batch_norm está presente
+        unidades, ativacao, dropout = camada[:3] # Get the first 3 elements (units, activation, dropout)
+        usar_batch_norm = camada[3] if len(camada) > 3 else False # Checks if batch_norm is present
 
         modelo.add(tf.keras.layers.Dense(unidades, activation=None))
         if usar_batch_norm:
@@ -290,7 +281,7 @@ def executar_modelo_otimizado(
         pasta_saida="Results_model"
 ):
     print(f"INICIANDO TREINAMENTO PARA {alvo} COM HIPERPARÂMETROS OTIMIZADOS")
-    # carregar_dados retorna X, y, nomes_caracteristicas, variaveis_removidas, mascara_atipicos
+    # load_data returns X, y, characteristic_names, removed_variables, atypical_masks
     X, y, nomes_caracteristicas, _, _ = carregar_dados(dados, alvo)
     print(f"Variáveis utilizadas: {nomes_caracteristicas}")
 
@@ -300,7 +291,7 @@ def executar_modelo_otimizado(
     print(f"Desenvolvimento: {len(X_desenvolvimento)} amostras")
     print(f"Teste: {len(X_teste)} amostras")
 
-    # VALIDAÇÃO CRUZADA K-FOLD
+    # K-FOLD CROSS-VALIDATION
     print(f"\nVALIDAÇÃO CRUZADA K-FOLD (k=5)")
     kf = KFold(n_splits=5, shuffle=True, random_state=SEMENTE)
     epocas_todas = []
@@ -331,7 +322,7 @@ def executar_modelo_otimizado(
         )
         epocas_todas.append(len(historico_fold.history['loss']))
 
-    # TREINAMENTO FINAL NO CONJUNTO DE DESENVOLVIMENTO
+    # FINAL TRAINING IN THE DEVELOPMENT SET
     print(f"\nTREINAMENTO FINAL")
     epocas_media = int(np.mean(epocas_todas))
     print(f"Épocas médias dos folds: {epocas_media}")
@@ -398,7 +389,7 @@ def executar_modelo_otimizado(
 
     print(f"\nArtefatos salvos em: {caminho}")
 
-    # Curva de perda final
+    # Final loss curve
     plt.figure(figsize=(10, 6))
     plt.plot(historico.history['loss'])
     plt.yscale('log')
@@ -410,7 +401,7 @@ def executar_modelo_otimizado(
     plt.savefig(os.path.join(caminho, 'perda_final.png'), dpi=300, bbox_inches='tight')
     plt.close()
 
-    # Predições vs Observações
+    # Predictions vs Observations
     plt.figure(figsize=(10, 8))
     plt.scatter(y_teste, y_pred, alpha=0.7, color='blue')
     valor_min = min(np.min(y_teste), np.min(y_pred))
@@ -426,15 +417,15 @@ def executar_modelo_otimizado(
     plt.savefig(os.path.join(caminho, 'predicoes_vs_observacoes.png'), dpi=300, bbox_inches='tight')
     plt.close()
 
-    # Salvar colunas de entrada
+    # Save input columns
     with open(os.path.join(caminho, "colunas_entrada.json"), "w") as f:
         json.dump(nomes_caracteristicas, f, indent=2)
 
-    # Salvar métricas do teste
+    # Save test metrics
     with open(os.path.join(caminho, "metricas_teste.json"), "w") as f:
         json.dump(converter_para_json_serializavel(metricas_teste), f, indent=2)
 
-    # Salvar hiperparâmetros com informações adicionais
+    # Save hyperparameters with additional information
     dados_configuracao = {
         'configuracao_predefinida': params,
         'colunas_entrada_original': nomes_caracteristicas,
@@ -463,6 +454,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    # Seleciona automaticamente a configuração da propriedade alvo
+    # Automatically selects the target property setting
     params_escolhidos = obter_configuracao(args.target)
     executar_modelo_otimizado(args.target, params_escolhidos, args.data_path, args.output_dir)

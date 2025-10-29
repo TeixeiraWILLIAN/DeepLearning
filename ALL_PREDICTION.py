@@ -40,13 +40,13 @@ import pandas as pd
 import joblib
 import tensorflow as tf
 
-# CONFIGURAÇÃO PRINCIPAL
-# Altere aqui para a propriedade que deseja prever.
-# Opções: 'Density', 'Pour_Point', 'Wax', 'Asphaltene', 'Viscosity_20C', 'Viscosity_50C'.
-# Use 'all' para executar a predição para todas as propriedades.
-PROPRIEDADE_A_PREVER = 'Density'  # <<< ALTERE AQUI
+# MAIN CONFIGURATION
+# Change here to the property you want to predict.
+# Options: 'Density', 'Pour_Point', 'Wax', 'Asphaltene', 'Viscosity_20C', 'Viscosity_50C'.
+# Use 'all' to run the prediction for all properties.
+PROPRIEDADE_A_PREVER = 'Density' # <<< CHANGE HERE
 
-# CONFIGURAÇÕES GERAIS (geralmente não precisam ser alteradas)
+# GENERAL SETTINGS (usually do not need to be changed)
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -135,8 +135,7 @@ def run_prediction(model, scaler_x, scaler_y, data: pd.DataFrame, prop_name: str
     logging.info("Predição concluída e resultados desnormalizados.")
     return pd.Series(predictions_denormalized.flatten(), name=f'{prop_name}_predicted')
 
-
-# EXECUÇÃO DO SCRIPT
+# SCRIPT EXECUTION
 if PROPRIEDADE_A_PREVER.lower() == 'all':
     properties_to_run = list(PROPERTIES_CONFIG.keys())
     logging.info("Executando predição para TODAS as propriedades disponíveis.")
@@ -174,12 +173,12 @@ if properties_to_run:
         results_df = input_data.copy()
         results_df[predictions.name] = predictions.values
         all_predictions[prop] = results_df
-
-        # Criar subpasta prediction/PROP
+       
+        # Create subfolder prediction/PROP
         prediction_dir = os.path.join('Prediction', prop)
         os.makedirs(prediction_dir, exist_ok=True)
 
-        # Salvar arquivos XML individuais por linha
+        # Save individual XML files by line
         for idx, row in results_df.iterrows():
             xml_content = "<Prediction>\n"
             for col in row.index:
@@ -192,7 +191,7 @@ if properties_to_run:
             with open(xml_path, 'w', encoding='utf-8') as f:
                 f.write(xml_content)
 
-        # Salvar XML agrupado com todas as predições em um único arquivo
+        # Save the grouped XML with all predictions in a single file.
         xml_agrupado = "<Predictions>\n"
         for idx, row in results_df.iterrows():
             xml_agrupado += "  <Prediction>\n"
@@ -209,7 +208,7 @@ if properties_to_run:
         logging.info(
             f"Arquivos XML individuais e agrupado salvos na pasta: {prediction_dir}")
 
-    # Salvar arquivo .xlsx individual por propriedade, dentro da pasta prediction/PROP
+    # Save individual .xlsx files per property, within the prediction/PROP folder.
     for prop_name, df in all_predictions.items():
         xlsx_path = os.path.join(
             'Prediction', prop_name, f'{prop_name}_completed.xlsx')
