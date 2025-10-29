@@ -1,0 +1,46 @@
+{
+  "hiperparametros_utilizados": {
+    "otimizador": "adam",
+    "taxa_aprendizado": 0.0370945205376818,
+    "tamanho_lote": 8,
+    "camadas": [
+      [
+        512,
+        "tanh",
+        0.00775117625775313
+      ],
+      [
+        128,
+        "relu",
+        0.033273865106612885
+      ]
+    ],
+    "reg_l1": 6.3560690619094156e-06,
+    "reg_l2": 1.2399557004054873e-05
+  },
+  "metricas_teste": {
+    "mse": 0.00011419744598777643,
+    "rmse": 0.010686320507442046,
+    "mae": 0.008364896228297392,
+    "r2": 0.9354542271369545,
+    "mape": 0.9802292640828133,
+    "erro_maximo": 0.025236066238540023,
+    "media_residuos": 0.0028591566719026406,
+    "desvio_residuos": 0.01029673099159588,
+    "p_shapiro": 0.6579825933094409,
+    "residuos_normais": true
+  },
+  "nomes_caracteristicas": [
+    "Pour_Point",
+    "Wax",
+    "Asphaltene",
+    "Viscosity_20C",
+    "Viscosity_50C"
+  ],
+  "info_conjunto_dados": {
+    "total_amostras": 103,
+    "amostras_treinamento": 93,
+    "amostras_teste": 10,
+    "num_caracteristicas": 5
+  }
+}

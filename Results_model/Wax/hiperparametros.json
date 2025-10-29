@@ -1,0 +1,58 @@
+{
+  "configuracao_predefinida": {
+    "otimizador": "rmsprop",
+    "taxa_aprendizado": 0.015218557038587922,
+    "tamanho_lote": 32,
+    "camadas": [
+      [
+        128,
+        "tanh",
+        0.31632860109975486
+      ],
+      [
+        512,
+        "relu",
+        0.08158012055887812
+      ],
+      [
+        256,
+        "relu",
+        0.18239033631836832
+      ]
+    ],
+    "reg_l1": 5.223282240031189e-05,
+    "reg_l2": 0.00011916931922503524
+  },
+  "colunas_entrada_original": [
+    "Density",
+    "Pour_Point",
+    "Asphaltene",
+    "Viscosity_20C",
+    "Viscosity_50C"
+  ],
+  "colunas_entrada_filtradas": [
+    "Density",
+    "Pour_Point",
+    "Asphaltene",
+    "Viscosity_20C",
+    "Viscosity_50C"
+  ],
+  "variaveis_removidas": [],
+  "metricas_teste": {
+    "mse": 15.327341035506993,
+    "rmse": 3.9150148193215046,
+    "mae": 3.1079703311200726,
+    "r2": -0.20246542669868717,
+    "mape": 78.22833321498031,
+    "erro_maximo": 8.346017346668601,
+    "media_residuos": -0.6774843056881344,
+    "desvio_residuos": 3.855950732446314,
+    "p_shapiro": 0.4261294998612939,
+    "residuos_normais": true
+  },
+  "resumo_metricas_cv": {
+    "mse_media": 15.327341035506993,
+    "rmse_media": 3.9150148193215046,
+    "r2_media": -0.20246542669868717
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "melhores_parametros": {
+    "tamanho_lote": 16,
+    "num_camadas": 2,
+    "unidades_0": 512,
+    "ativacao_0": "tanh",
+    "dropout_0": 0.22752447466384726,
+    "batch_norm_0": false,
+    "unidades_1": 256,
+    "ativacao_1": "leaky_relu",
+    "dropout_1": 0.4192444722079106,
+    "batch_norm_1": false,
+    "reg_l1": 0.0002539265554964262,
+    "reg_l2": 0.0005576390842363991,
+    "otimizador": "rmsprop",
+    "taxa_aprendizado": 0.00785383574166884
+  },
+  "melhor_pontuacao_validacao": 0.023324087692890315,
+  "metricas_teste": {
+    "mse": 2342.010668525153,
+    "rmse": 48.39432475533834,
+    "mae": 32.073243166161376,
+    "r2": 0.8449547862713678,
+    "mape": 277.88454412223325,
+    "erro_maximo": 139.25268081351447,
+    "media_residuos": -14.94263488822647,
+    "desvio_residuos": 46.02964621982565,
+    "p_shapiro": 0.11854774415771474,
+    "residuos_normais": 
