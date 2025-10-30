@@ -11,7 +11,7 @@ Main Features:
 - Performs K-Fold cross-validation to estimate model stability.
 - Executes final model training with early stopping and learning rate scheduling.
 - Computes a comprehensive set of performance metrics (MSE, RMSE, MAE, R², MAPE,
-  residual distribution, and Shapiro–Wilk test).
+  residual distribution, and Shapiro Wilk test).
 - Saves all artifacts including:
   * Trained model (.keras)
   * Scalers (joblib)
@@ -104,18 +104,19 @@ configuracoes_predefinidas = {
     ),
 
     'Viscosity_50C': dict(
-        otimizador='adam',
-        taxa_aprendizado=0.06575532676469606,
-        tamanho_lote=8,
-        camadas=[(128, 'relu', 0.26045578700945404), (512, 'relu', 0.2566098692808757), (256, 'relu', 0.2594589960940878)],
-        reg_l1=1.3664046841825706e-05,
-        reg_l2=0.0005492514348692152
+        otimizador='rmsprop',
+        taxa_aprendizado=0.04316747384224007,
+        tamanho_lote=32,
+        camadas=[(64, 'leakyrelu', 0.1170434889383446), 
+                 (32, 'relu', 0.3912906794861852)],
+        reg_l1=7.57472071885502e-06,
+        reg_l2=1.9660467736409024e-05
     )
 }
 
 # MAIN CONFIGURATION
 COLUNAS = ["Density", "Pour_Point", "Wax", "Asphaltene", "Viscosity_20C", "Viscosity_50C"]
-VARIAVEL = "Wax"
+VARIAVEL = "Viscosity_50C"
 
 # Utilities
 def converter_para_json_serializavel(obj):

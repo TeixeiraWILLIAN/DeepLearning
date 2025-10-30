@@ -62,8 +62,8 @@ DESEMPENHO_MODELOS = {
     'Viscosity_20C': 0.97,
     'Pour_Point': 0.30,
     'Asphaltene': 0.27,
-    'Wax': -0.20,
-    'Viscosity_50C': 0
+    'Wax': 0.31,
+    'Viscosity_50C': 0.91
 }
 
 MODELS_FOLDER = 'Results_model'
@@ -218,19 +218,23 @@ def exibir_resultado(propriedade_alvo, predicao, valores_entrada, r2):
 
     # Model performance
     if r2 > 0.90:
+        cor = "\033[92m"  # Verde
         status = "Altamente Confiável"
         confianca = "Alta"
     elif r2 > 0.50:
+        cor = "\033[93m"  # Amarelo
         status = "Moderadamente Confiável"
         confianca = "Moderada"
     else:
+        cor = "\033[91m"  # Vermelho
         status = "Baixa Confiabilidade"
         confianca = "Baixa"
 
+    reset = "\033[0m"  # Resetar cor
+
     print(f"Desempenho do Modelo (R²): {r2:.4f}")
-    print(f"Status: {status}")
-    print(f"Confiança Estimada: {confianca}")
-    print()
+    print(f"Status: {cor}{status}{reset}")
+    print(f"Confiança Estimada: {cor}{confianca}{reset}\n")
 
     # Input values ​​used
     print("Valores de Entrada Utilizados:")

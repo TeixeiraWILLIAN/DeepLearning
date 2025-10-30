@@ -13,7 +13,7 @@ Main Features:
 - Dynamic neural network architecture with variable depth, activation,
   dropout, and regularization settings.
 - Model evaluation using multiple metrics (MSE, RMSE, MAE, R², MAPE,
-  residual analysis, and Shapiro-Wilk test).
+  residual analysis, and Shapiro Wilk test).
 - Automatic saving of results, configurations, and training history.
 - Visualization of optimization progress and prediction performance.
 
@@ -60,7 +60,7 @@ np.random.seed(SEMENTE)
 # MAIN CONFIGURATION
 COLUNAS = ["Density", "Pour_Point", "Wax",
            "Asphaltene", "Viscosity_20C", "Viscosity_50C"]
-VARIAVEL = "Wax"
+VARIAVEL = "Viscosity_50C"
 FOLDS = 5
 TENTATIVAS = 500
 
