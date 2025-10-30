@@ -89,8 +89,7 @@ configuracoes_predefinidas = {
         taxa_aprendizado=0.015218557038587922,
         tamanho_lote=32,
         camadas=[(128, 'tanh', 0.31632860109975486),
-                 (512, 'relu', 0.08158012055887812),
-                 (256, 'relu', 0.18239033631836832)],
+                 (512, 'leakyrelu', 0.08158012055887812)],
         reg_l1=5.223282240031189e-05,
         reg_l2=0.00011916931922503524
     ),
@@ -116,7 +115,7 @@ configuracoes_predefinidas = {
 
 # MAIN CONFIGURATION
 COLUNAS = ["Density", "Pour_Point", "Wax", "Asphaltene", "Viscosity_20C", "Viscosity_50C"]
-VARIAVEL = "Viscosity_50C"
+VARIAVEL = "Wax"
 
 # Utilities
 def converter_para_json_serializavel(obj):
@@ -277,7 +276,7 @@ def avaliacao_abrangente(y_verdadeiro, y_predito):
 def executar_modelo_otimizado(
         alvo,
         params,
-        dados="propriedades_oleo_SINTEF_final.xlsx",
+        dados="oil_prop_database.xlsx",
         pasta_saida="Results_model"
 ):
     print(f"INICIANDO TREINAMENTO PARA {alvo} COM HIPERPARÂMETROS OTIMIZADOS")
@@ -447,7 +446,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Executa o modelo de rede neural com hiperparâmetros específicos por propriedade.")
     parser.add_argument("--target", type=str, default=VARIAVEL,
                         help="Variável alvo: 'Density', 'Pour_Point', 'Wax', 'Asphaltene', 'Viscosity_20C', 'Viscosity_50C'.")
-    parser.add_argument("--data_path", type=str, default="propriedades_oleo_SINTEF_final.xlsx",
+    parser.add_argument("--data_path", type=str, default="oil_prop_database.xlsx",
                         help="Caminho para o arquivo de dados de entrada.")
     parser.add_argument("--output_dir", type=str, default="Results_model",
                         help="Diretório para salvar os resultados e artefatos do modelo.")

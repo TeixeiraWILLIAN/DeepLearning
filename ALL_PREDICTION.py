@@ -60,7 +60,7 @@ PROPERTIES_CONFIG = {
 }
 
 BASE_RESULTS_FOLDER = 'Results_model'
-INPUT_DATA_FILE = 'propriedades_oleo_SINTEF_final.xlsx'
+INPUT_DATA_FILE = 'oil_prop_database.xlsx'
 OUTPUT_PREDICTIONS_FILE = f'{PROPRIEDADE_A_PREVER}_completed.xlsx'
 
 

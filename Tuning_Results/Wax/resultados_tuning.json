@@ -1,33 +1,47 @@
 {
   "melhores_parametros": {
-    "tamanho_lote": 16,
-    "num_camadas": 3,
-    "unidades_0": 512,
+    "tamanho_lote": 32,
+    "num_camadas": 2,
+    "unidades_0": 128,
     "ativacao_0": "tanh",
-    "dropout_0": 0.39901443783123663,
+    "dropout_0": 0.31632860109975486,
     "batch_norm_0": false,
     "unidades_1": 512,
-    "ativacao_1": "relu",
-    "dropout_1": 0.09655177191696303,
+    "ativacao_1": "leaky_relu",
+    "dropout_1": 0.08158012055887812,
     "batch_norm_1": false,
-    "unidades_2": 256,
-    "ativacao_2": "relu",
-    "dropout_2": 0.18239033631836832,
-    "batch_norm_2": false,
-    "reg_l1": 6.040250042724104e-06,
-    "reg_l2": 0.00013982551837145722,
+    "reg_l1": 5.223282240031189e-05,
+    "reg_l2": 0.00011916931922503524,
     "otimizador": "rmsprop",
-    "taxa_aprendizado": 0.002558220667190468
+    "taxa_aprendizado": 0.015218557038587922
   },
-  "melhor_pontuacao_validacao": 0.4468308657407761,
+  "melhor_pontuacao_validacao": 0.5868910014629364,
   "metricas_teste": {
-    "mse": 13.560118515468636,
-    "rmse": 3.6824066200609398,
-    "mae": 3.077147091430078,
-    "r2": -0.013186442778924556,
-    "mape": 79.77350604753742,
-    "erro_maximo": 7.105709075927734,
-    "media_residuos": -0.529330525157413,
-    "desvio_residuos": 3.644163513154317,
-    "p_shapiro": 0.49701185256760655,
-    "residuos_normais": 
+    "mse": 9.984469709670387,
+    "rmse": 3.159821151532217,
+    "mae": 2.447189131767817,
+    "r2": 0.21669521138819048,
+    "mape": 61.63553196705382,
+    "erro_maximo": 6.339802380114639,
+    "media_residuos": -2.3016287078344737,
+    "desvio_residuos": 2.1649422627272528,
+    "p_shapiro": 0.5657637766872269,
+    "residuos_normais": true
+  },
+  "nomes_caracteristicas": [
+    "Density",
+    "Pour_Point",
+    "Asphaltene",
+    "Viscosity_20C",
+    "Viscosity_50C"
+  ],
+  "variaveis_removidas": [],
+  "atipicos_detectados": 0,
+  "num_tentativas": 500,
+  "info_conjunto_dados": {
+    "total_amostras": 103,
+    "amostras_desenvolvimento": 93,
+    "amostras_teste": 10,
+    "num_caracteristicas": 5
+  }
+}

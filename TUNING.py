@@ -319,7 +319,7 @@ def avaliacao_abrangente(y_verdadeiro, y_predito):
 
 def executar_tuning(
         alvo,
-        dados="propriedades_oleo_SINTEF_final.xlsx",
+        dados="oil_prop_database.xlsx",
         tentativas=TENTATIVAS,
         pasta_saida="Tuning_Results"
 ):
@@ -475,7 +475,7 @@ if __name__ == "__main__":
                     help="Propriedade a ser predita")
     ap.add_argument("--tentativas", type=int, default=TENTATIVAS,
                     help="Número de tentativas para otimização")
-    ap.add_argument("--dados", default="propriedades_oleo_SINTEF_final.xlsx",
+    ap.add_argument("--dados", default="oil_prop_database.xlsx",
                     help="Arquivo de dados")
     ap.add_argument("--folds", type=int, default=FOLDS,
                     help="Número de folds para validação cruzada")
