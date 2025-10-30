@@ -70,7 +70,7 @@ configuracoes_predefinidas = {
         otimizador='adam',
         taxa_aprendizado=0.002821109346785365,
         tamanho_lote=16,
-        camadas=[(128, 'relu', 0.28221415209509226), (256, 'relu', 0.1374385906580356)],
+        camadas=[(128, 'leakyrelu', 0.28221415209509226), (256, 'relu', 0.1374385906580356)],
         reg_l1=4.8497904001971764e-05,
         reg_l2=0.00012448401445882366
     ),
@@ -116,7 +116,7 @@ configuracoes_predefinidas = {
 
 # MAIN CONFIGURATION
 COLUNAS = ["Density", "Pour_Point", "Wax", "Asphaltene", "Viscosity_20C", "Viscosity_50C"]
-VARIAVEL = "Viscosity_50C"
+VARIAVEL = "Asphaltene"
 
 # Utilities
 def converter_para_json_serializavel(obj):

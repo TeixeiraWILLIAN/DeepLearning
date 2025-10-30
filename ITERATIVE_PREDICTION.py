@@ -61,7 +61,7 @@ DESEMPENHO_MODELOS = {
     'Density': 0.93,
     'Viscosity_20C': 0.97,
     'Pour_Point': 0.30,
-    'Asphaltene': 0.27,
+    'Asphaltene': 0.63,
     'Wax': 0.31,
     'Viscosity_50C': 0.91
 }
