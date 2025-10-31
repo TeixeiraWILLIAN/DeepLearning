@@ -44,7 +44,7 @@ import tensorflow as tf
 # Change here to the property you want to predict.
 # Options: 'Density', 'Pour_Point', 'Wax', 'Asphaltene', 'Viscosity_20C', 'Viscosity_50C'.
 # Use 'all' to run the prediction for all properties.
-PROPRIEDADE_A_PREVER = 'Density' # <<< CHANGE HERE
+PROPRIEDADE_A_PREVER = 'Density'  # <<< CHANGE HERE
 
 # GENERAL SETTINGS (usually do not need to be changed)
 logging.basicConfig(level=logging.INFO,
@@ -135,6 +135,7 @@ def run_prediction(model, scaler_x, scaler_y, data: pd.DataFrame, prop_name: str
     logging.info("Predição concluída e resultados desnormalizados.")
     return pd.Series(predictions_denormalized.flatten(), name=f'{prop_name}_predicted')
 
+
 # SCRIPT EXECUTION
 if PROPRIEDADE_A_PREVER.lower() == 'all':
     properties_to_run = list(PROPERTIES_CONFIG.keys())
@@ -173,7 +174,7 @@ if properties_to_run:
         results_df = input_data.copy()
         results_df[predictions.name] = predictions.values
         all_predictions[prop] = results_df
-       
+
         # Create subfolder prediction/PROP
         prediction_dir = os.path.join('Prediction', prop)
         os.makedirs(prediction_dir, exist_ok=True)

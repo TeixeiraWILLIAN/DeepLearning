@@ -40,7 +40,10 @@ Dependencies: TensorFlow, NumPy, Pandas, Scikit-learn, Matplotlib, SciPy, Joblib
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-import os, json, joblib, argparse
+import os
+import json
+import joblib
+import argparse
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split, KFold
 from sklearn.preprocessing import StandardScaler, RobustScaler
@@ -61,7 +64,8 @@ configuracoes_predefinidas = {
         otimizador='adam',
         taxa_aprendizado=0.0370945205376818,
         tamanho_lote=8,
-        camadas=[(512, 'tanh', 0.00775117625775313), (128, 'relu', 0.033273865106612885)],
+        camadas=[(512, 'tanh', 0.00775117625775313),
+                 (128, 'relu', 0.033273865106612885)],
         reg_l1=6.3560690619094156e-06,
         reg_l2=1.2399557004054873e-05
     ),
@@ -70,7 +74,8 @@ configuracoes_predefinidas = {
         otimizador='adam',
         taxa_aprendizado=0.002821109346785365,
         tamanho_lote=16,
-        camadas=[(128, 'leakyrelu', 0.28221415209509226), (256, 'relu', 0.1374385906580356)],
+        camadas=[(128, 'leakyrelu', 0.28221415209509226),
+                 (256, 'relu', 0.1374385906580356)],
         reg_l1=4.8497904001971764e-05,
         reg_l2=0.00012448401445882366
     ),
@@ -79,7 +84,8 @@ configuracoes_predefinidas = {
         otimizador='adam',
         taxa_aprendizado=0.0009368323927352315,
         tamanho_lote=32,
-        camadas=[(512, 'relu', 0.03332736826621852), (256, 'tanh', 0.3823054650868597)],
+        camadas=[(512, 'relu', 0.03332736826621852),
+                 (256, 'tanh', 0.3823054650868597)],
         reg_l1=1.1732750655683321e-06,
         reg_l2=6.187908737771573e-05
     ),
@@ -98,7 +104,8 @@ configuracoes_predefinidas = {
         otimizador='rmsprop',
         taxa_aprendizado=0.006816805963431236,
         tamanho_lote=32,
-        camadas=[(512, 'tanh', 0.23097950960028463), (512, 'relu', 0.42916996858725887)],
+        camadas=[(512, 'tanh', 0.23097950960028463),
+                 (512, 'relu', 0.42916996858725887)],
         reg_l1=2.236474408206667e-06,
         reg_l2=1.8100436625872475e-06
     ),
@@ -107,7 +114,7 @@ configuracoes_predefinidas = {
         otimizador='rmsprop',
         taxa_aprendizado=0.04316747384224007,
         tamanho_lote=32,
-        camadas=[(64, 'leakyrelu', 0.1170434889383446), 
+        camadas=[(64, 'leakyrelu', 0.1170434889383446),
                  (32, 'relu', 0.3912906794861852)],
         reg_l1=7.57472071885502e-06,
         reg_l2=1.9660467736409024e-05
@@ -115,10 +122,13 @@ configuracoes_predefinidas = {
 }
 
 # MAIN CONFIGURATION
-COLUNAS = ["Density", "Pour_Point", "Wax", "Asphaltene", "Viscosity_20C", "Viscosity_50C"]
-VARIAVEL = "Density"
+COLUNAS = ["Density", "Pour_Point", "Wax",
+           "Asphaltene", "Viscosity_20C", "Viscosity_50C"]
+VARIAVEL = "Asphaltene"
 
 # Utilities
+
+
 def converter_para_json_serializavel(obj):
     if isinstance(obj, dict):
         return {k: converter_para_json_serializavel(v) for k, v in obj.items()}
@@ -137,13 +147,16 @@ def converter_para_json_serializavel(obj):
     else:
         return obj
 
+
 def detectar_valores_atipicos(X, y, contaminacao=0.1):
     # Not used in this script, but kept for signature compatibility if needed.
     return np.zeros(len(X), dtype=bool)
 
+
 def tratar_multicolinearidade(X, nomes_variaveis, limite=0.95):
     # Not used in this script, but kept for signature compatibility if needed.
     return X, nomes_variaveis, []
+
 
 def carregar_dados(caminho, alvo):
     if not os.path.exists(caminho):
@@ -164,7 +177,8 @@ def carregar_dados(caminho, alvo):
             .dropna()
         )
     except Exception as e:
-        raise ValueError(f"Erro ao carregar dados do arquivo {caminho}: {str(e)}")
+        raise ValueError(
+            f"Erro ao carregar dados do arquivo {caminho}: {str(e)}")
 
     if df.empty:
         raise ValueError("Dataset vazio após limpeza dos dados")
@@ -179,6 +193,8 @@ def carregar_dados(caminho, alvo):
     return X, y, colunas_caracteristicas, [], None
 
 # Gets the configuration for the target variable
+
+
 def obter_configuracao(alvo):
     """
     Retrieves the target variable configuration in the new format (layers=[(...), ...]).
@@ -186,19 +202,25 @@ def obter_configuracao(alvo):
     if alvo in configuracoes_predefinidas:
         return configuracoes_predefinidas[alvo]
     else:
-        raise ValueError(f"Configuração predefinida não encontrada para a variável alvo: {alvo}")
+        raise ValueError(
+            f"Configuração predefinida não encontrada para a variável alvo: {alvo}")
 
 # Model builder with fixed parameters
+
+
 def construir_modelo_otimizado(params, dimensao_entrada):
     """
     Builds the neural network model based on the provided parameters.
     Expects the format: params["layers"] = [(units, ativ, dropout), ...]
     """
-    modelo = tf.keras.Sequential([tf.keras.layers.Input(shape=(dimensao_entrada,))])
+    modelo = tf.keras.Sequential(
+        [tf.keras.layers.Input(shape=(dimensao_entrada,))])
 
     for camada in params["camadas"]:
-        unidades, ativacao, dropout = camada[:3] # Get the first 3 elements (units, activation, dropout)
-        usar_batch_norm = camada[3] if len(camada) > 3 else False # Checks if batch_norm is present
+        # Get the first 3 elements (units, activation, dropout)
+        unidades, ativacao, dropout = camada[:3]
+        # Checks if batch_norm is present
+        usar_batch_norm = camada[3] if len(camada) > 3 else False
 
         modelo.add(tf.keras.layers.Dense(unidades, activation=None))
         if usar_batch_norm:
@@ -231,10 +253,12 @@ def construir_modelo_otimizado(params, dimensao_entrada):
     elif nome_otimizador == "sgd":
         otimizador = tf.keras.optimizers.SGD(learning_rate=taxa_aprendizado)
     else:
-        otimizador = tf.keras.optimizers.RMSprop(learning_rate=taxa_aprendizado)
+        otimizador = tf.keras.optimizers.RMSprop(
+            learning_rate=taxa_aprendizado)
 
     modelo.compile(optimizer=otimizador, loss="mse", metrics=["mae"])
     return modelo
+
 
 def avaliacao_abrangente(y_verdadeiro, y_predito):
     mse = mean_squared_error(y_verdadeiro, y_predito)
@@ -274,6 +298,7 @@ def avaliacao_abrangente(y_verdadeiro, y_predito):
         "residuos_normais": residuos_normais
     }
 
+
 def executar_modelo_otimizado(
         alvo,
         params,
@@ -290,7 +315,7 @@ def executar_modelo_otimizado(
     )
     print(f"Desenvolvimento: {len(X_desenvolvimento)} amostras")
     print(f"Teste: {len(X_teste)} amostras")
-    #print(f"Valores do conjunto teste usado: {y_teste}")
+    # print(f"Valores do conjunto teste usado: {y_teste}")
 
     # K-FOLD CROSS-VALIDATION
     print(f"\nVALIDAÇÃO CRUZADA K-FOLD (k=5)")
@@ -306,11 +331,14 @@ def executar_modelo_otimizado(
         y_treino_norm = normalizador_y.fit_transform(y_desenvolvimento[treino])
         y_val_norm = normalizador_y.transform(y_desenvolvimento[validacao])
 
-        modelo_fold = construir_modelo_otimizado(params, X_desenvolvimento.shape[1])
+        modelo_fold = construir_modelo_otimizado(
+            params, X_desenvolvimento.shape[1])
 
         callbacks = [
-            tf.keras.callbacks.EarlyStopping('val_loss', patience=20, restore_best_weights=True, verbose=0),
-            tf.keras.callbacks.ReduceLROnPlateau('val_loss', patience=10, factor=0.5, verbose=0)
+            tf.keras.callbacks.EarlyStopping(
+                'val_loss', patience=20, restore_best_weights=True, verbose=0),
+            tf.keras.callbacks.ReduceLROnPlateau(
+                'val_loss', patience=10, factor=0.5, verbose=0)
         ]
 
         historico_fold = modelo_fold.fit(
@@ -332,11 +360,14 @@ def executar_modelo_otimizado(
     X_dev_norm = normalizador_x.fit_transform(X_desenvolvimento)
     y_dev_norm = normalizador_y.fit_transform(y_desenvolvimento)
 
-    modelo_final = construir_modelo_otimizado(params, X_desenvolvimento.shape[1])
+    modelo_final = construir_modelo_otimizado(
+        params, X_desenvolvimento.shape[1])
 
     callbacks_finais = [
-        tf.keras.callbacks.EarlyStopping('loss', patience=15, restore_best_weights=True, verbose=0),
-        tf.keras.callbacks.ReduceLROnPlateau('loss', patience=8, factor=0.5, verbose=0)
+        tf.keras.callbacks.EarlyStopping(
+            'loss', patience=15, restore_best_weights=True, verbose=0),
+        tf.keras.callbacks.ReduceLROnPlateau(
+            'loss', patience=8, factor=0.5, verbose=0)
     ]
 
     historico = modelo_final.fit(
@@ -380,13 +411,16 @@ def executar_modelo_otimizado(
     with open(os.path.join(caminho, f"resultados_{alvo}_otimizado.json"), "w") as fp:
         json.dump(resultados, fp, indent=2)
 
-    historico_serializavel = {chave: [float(v) for v in valor] for chave, valor in historico.history.items()}
+    historico_serializavel = {
+        chave: [float(v) for v in valor] for chave, valor in historico.history.items()}
     with open(os.path.join(caminho, f"{alvo}_historico_treinamento.json"), "w") as fp:
         json.dump(historico_serializavel, fp, indent=2)
 
     modelo_final.save(os.path.join(caminho, f"modelo_{alvo}.keras"))
-    joblib.dump(normalizador_x, os.path.join(caminho, f"{alvo}_normalizador_x.pkl"))
-    joblib.dump(normalizador_y, os.path.join(caminho, f"{alvo}_normalizador_y.pkl"))
+    joblib.dump(normalizador_x, os.path.join(
+        caminho, f"{alvo}_normalizador_x.pkl"))
+    joblib.dump(normalizador_y, os.path.join(
+        caminho, f"{alvo}_normalizador_y.pkl"))
 
     print(f"\nArtefatos salvos em: {caminho}")
 
@@ -399,7 +433,8 @@ def executar_modelo_otimizado(
     plt.title(f'{alvo} – Treinamento final')
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
-    plt.savefig(os.path.join(caminho, 'perda_final.png'), dpi=300, bbox_inches='tight')
+    plt.savefig(os.path.join(caminho, 'perda_final.png'),
+                dpi=300, bbox_inches='tight')
     plt.close()
 
     # Predictions vs Observations
@@ -415,7 +450,8 @@ def executar_modelo_otimizado(
     plt.text(0.05, 0.95, f'R² = {metricas_teste["r2"]:.4f}', transform=plt.gca().transAxes,
              bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
     plt.tight_layout()
-    plt.savefig(os.path.join(caminho, 'predicoes_vs_observacoes.png'), dpi=300, bbox_inches='tight')
+    plt.savefig(os.path.join(caminho, 'predicoes_vs_observacoes.png'),
+                dpi=300, bbox_inches='tight')
     plt.close()
 
     # Save input columns
@@ -424,7 +460,8 @@ def executar_modelo_otimizado(
 
     # Save test metrics
     with open(os.path.join(caminho, "metricas_teste.json"), "w") as f:
-        json.dump(converter_para_json_serializavel(metricas_teste), f, indent=2)
+        json.dump(converter_para_json_serializavel(
+            metricas_teste), f, indent=2)
 
     # Save hyperparameters with additional information
     dados_configuracao = {
@@ -440,12 +477,15 @@ def executar_modelo_otimizado(
         }
     }
     with open(os.path.join(caminho, 'hiperparametros.json'), 'w') as f:
-        json.dump(converter_para_json_serializavel(dados_configuracao), f, indent=2)
+        json.dump(converter_para_json_serializavel(
+            dados_configuracao), f, indent=2)
 
     return metricas_teste
 
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Executa o modelo de rede neural com hiperparâmetros específicos por propriedade.")
+    parser = argparse.ArgumentParser(
+        description="Executa o modelo de rede neural com hiperparâmetros específicos por propriedade.")
     parser.add_argument("--target", type=str, default=VARIAVEL,
                         help="Variável alvo: 'Density', 'Pour_Point', 'Wax', 'Asphaltene', 'Viscosity_20C', 'Viscosity_50C'.")
     parser.add_argument("--data_path", type=str, default="oil_prop_database.xlsx",
@@ -457,4 +497,5 @@ if __name__ == "__main__":
 
     # Automatically selects the target property setting
     params_escolhidos = obter_configuracao(args.target)
-    executar_modelo_otimizado(args.target, params_escolhidos, args.data_path, args.output_dir)
+    executar_modelo_otimizado(
+        args.target, params_escolhidos, args.data_path, args.output_dir)

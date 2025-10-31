@@ -56,17 +56,19 @@ DESEMPENHO_MODELOS = {
 }
 
 # Path to models
-MODELS_FOLDER = MODELS_FOLDER = 'C:/Users/10490492924/DeepLearning/Results_model'   
+MODELS_FOLDER = MODELS_FOLDER = 'C:/Users/10490492924/DeepLearning/Results_model'
 
 # Dictionary to store model loading status
 LOAD_STATUS = {}
 
 # Cached loading functions for optimization
 
+
 @st.cache_resource
 def load_tf_model(propriedade):
-    """Loads the TensorFlow model."""    
-    modelo_path = os.path.join(MODELS_FOLDER, propriedade, f'modelo_{propriedade}.keras')
+    """Loads the TensorFlow model."""
+    modelo_path = os.path.join(
+        MODELS_FOLDER, propriedade, f'modelo_{propriedade}.keras')
     if not os.path.exists(modelo_path):
         LOAD_STATUS[propriedade] = f"Modelo .keras não encontrado em: {modelo_path}"
         return None
@@ -77,15 +79,18 @@ def load_tf_model(propriedade):
         LOAD_STATUS[propriedade] = f"Erro ao carregar modelo .keras: {e}"
         return None
 
+
 @st.cache_data
 def load_joblib_data(propriedade, suffix):
     """Loads scalers and JSON columns with cached data."""
-    
+
     # Load column JSON file
     if suffix == 'colunas_entrada':
-        file_path = os.path.join(MODELS_FOLDER, propriedade, 'colunas_entrada.json')
+        file_path = os.path.join(
+            MODELS_FOLDER, propriedade, 'colunas_entrada.json')
         if not os.path.exists(file_path):
-            LOAD_STATUS[propriedade] = f"Arquivo de colunas .json não encontrado em: {file_path}"
+            LOAD_STATUS[
+                propriedade] = f"Arquivo de colunas .json não encontrado em: {file_path}"
             return None
         try:
             with open(file_path, 'r') as f:
@@ -93,9 +98,10 @@ def load_joblib_data(propriedade, suffix):
         except Exception as e:
             LOAD_STATUS[propriedade] = f"Erro ao carregar colunas .json: {e}"
             return None
-    
+
     # Load scaler .pkl files
-    file_path = os.path.join(MODELS_FOLDER, propriedade, f'{propriedade}_{suffix}.pkl')
+    file_path = os.path.join(MODELS_FOLDER, propriedade,
+                             f'{propriedade}_{suffix}.pkl')
     if not os.path.exists(file_path):
         LOAD_STATUS[propriedade] = f"Scaler .pkl não encontrado em: {file_path}"
         return None
@@ -105,6 +111,7 @@ def load_joblib_data(propriedade, suffix):
         LOAD_STATUS[propriedade] = f"Erro ao carregar scaler .pkl: {e}"
         return None
 
+
 def carregar_modelo_completo(propriedade):
     """Main function to load all model artifacts."""
     LOAD_STATUS.clear()
@@ -112,11 +119,12 @@ def carregar_modelo_completo(propriedade):
     scaler_x = load_joblib_data(propriedade, 'normalizador_x')
     scaler_y = load_joblib_data(propriedade, 'normalizador_y')
     colunas_entrada = load_joblib_data(propriedade, 'colunas_entrada')
-    
+
     if modelo and scaler_x and scaler_y and colunas_entrada:
         return modelo, scaler_x, scaler_y, colunas_entrada
     else:
         return None, None, None, None
+
 
 def fazer_predicao(modelo, scaler_x, scaler_y, valores_entrada, colunas_esperadas):
     """Performs the prediction."""
@@ -138,6 +146,7 @@ def fazer_predicao(modelo, scaler_x, scaler_y, valores_entrada, colunas_esperada
 
 # STREAMLIT INTERFACE
 
+
 # Page configuration
 st.set_page_config(
     page_title="Predição de Propriedades do Petróleo",
@@ -157,11 +166,13 @@ with st.sidebar:
     propriedade_alvo = st.selectbox(
         "Selecione a Propriedade a Predizer:",
         options=PROPRIEDADES,
-        index=PROPRIEDADES.index('Viscosity_50C') if 'Viscosity_50C' in PROPRIEDADES else 0
+        index=PROPRIEDADES.index(
+            'Viscosity_50C') if 'Viscosity_50C' in PROPRIEDADES else 0
     )
 
     # Load model
-    modelo, scaler_x, scaler_y, colunas_entrada = carregar_modelo_completo(propriedade_alvo)
+    modelo, scaler_x, scaler_y, colunas_entrada = carregar_modelo_completo(
+        propriedade_alvo)
 
     # Display R² and confidence
     if modelo is not None:
@@ -186,10 +197,12 @@ with st.sidebar:
 if modelo is not None:
 
     # Expected input columns (all except target)
-    colunas_entrada_esperadas = [col for col in colunas_entrada if col != propriedade_alvo]
+    colunas_entrada_esperadas = [
+        col for col in colunas_entrada if col != propriedade_alvo]
 
     st.header(f"Insira os Valores para Predizer **{propriedade_alvo}**")
-    st.markdown(f"A propriedade alvo será predita em **{UNIDADES[propriedade_alvo]}**.")
+    st.markdown(
+        f"A propriedade alvo será predita em **{UNIDADES[propriedade_alvo]}**.")
     st.markdown("---")
 
     valores_entrada = {}
@@ -211,7 +224,7 @@ if modelo is not None:
                 min_value=float(min_val),
                 max_value=float(max_val),
                 value=(min_val + max_val) / 2,
-                step=(max_val - min_val) / 100, # Smaller step for precision
+                step=(max_val - min_val) / 100,  # Smaller step for precision
                 format="%.4f",
                 help=f"Range típico: {min_val} a {max_val} {unidade}"
             )
@@ -262,9 +275,11 @@ if modelo is not None:
 
 else:
     # Show detailed error if model loading fails
-    st.error("Não foi possível carregar os modelos. Verifique a estrutura de arquivos.")
-    st.info(f"O Streamlit está procurando os modelos na pasta: `{MODELS_FOLDER}`")
-    
+    st.error(
+        "Não foi possível carregar os modelos. Verifique a estrutura de arquivos.")
+    st.info(
+        f"O Streamlit está procurando os modelos na pasta: `{MODELS_FOLDER}`")
+
     if LOAD_STATUS:
         st.subheader("Detalhes do Erro de Carregamento:")
         # Display individual error messages
@@ -273,4 +288,5 @@ else:
 
 # Footer
 st.markdown("---")
-st.markdown("Projeto de Deep Learning para Predição de Propriedades do Petróleo Bruto.")
+st.markdown(
+    "Projeto de Deep Learning para Predição de Propriedades do Petróleo Bruto.")
