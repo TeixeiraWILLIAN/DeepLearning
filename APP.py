@@ -56,7 +56,7 @@ DESEMPENHO_MODELOS = {
 }
 
 # Path to models
-MODELS_FOLDER = MODELS_FOLDER = 'C:/Users/10490492924/DeepLearning/Results_model'
+MODELS_FOLDER = 'Results_model'
 
 # Dictionary to store model loading status
 LOAD_STATUS = {}
