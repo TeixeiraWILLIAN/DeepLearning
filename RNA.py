@@ -116,7 +116,7 @@ configuracoes_predefinidas = {
 
 # MAIN CONFIGURATION
 COLUNAS = ["Density", "Pour_Point", "Wax", "Asphaltene", "Viscosity_20C", "Viscosity_50C"]
-VARIAVEL = "Pour_Point"
+VARIAVEL = "Density"
 
 # Utilities
 def converter_para_json_serializavel(obj):
@@ -290,6 +290,7 @@ def executar_modelo_otimizado(
     )
     print(f"Desenvolvimento: {len(X_desenvolvimento)} amostras")
     print(f"Teste: {len(X_teste)} amostras")
+    #print(f"Valores do conjunto teste usado: {y_teste}")
 
     # K-FOLD CROSS-VALIDATION
     print(f"\nVALIDAÇÃO CRUZADA K-FOLD (k=5)")
