@@ -116,7 +116,7 @@ configuracoes_predefinidas = {
 
 # MAIN CONFIGURATION
 COLUNAS = ["Density", "Pour_Point", "Wax", "Asphaltene", "Viscosity_20C", "Viscosity_50C"]
-VARIAVEL = "Asphaltene"
+VARIAVEL = "Pour_Point"
 
 # Utilities
 def converter_para_json_serializavel(obj):
