@@ -124,7 +124,7 @@ configuracoes_predefinidas = {
 # MAIN CONFIGURATION
 COLUNAS = ["Density", "Pour_Point", "Wax",
            "Asphaltene", "Viscosity_20C", "Viscosity_50C"]
-VARIAVEL = "Asphaltene"
+VARIAVEL = "Viscosity_20C"
 
 # Utilities
 
@@ -315,7 +315,7 @@ def executar_modelo_otimizado(
     )
     print(f"Desenvolvimento: {len(X_desenvolvimento)} amostras")
     print(f"Teste: {len(X_teste)} amostras")
-    # print(f"Valores do conjunto teste usado: {y_teste}")
+    #print(f"Valores do conjunto teste usado: {y_teste}")
 
     # K-FOLD CROSS-VALIDATION
     print(f"\nVALIDAÇÃO CRUZADA K-FOLD (k=5)")

@@ -49,12 +49,12 @@ UNIDADES = {
 }
 
 RANGES_TIPICOS = {
-    'Density': (0.75, 1.05),
-    'Pour_Point': (-40, 30),
-    'Wax': (0, 20),
+    'Density': (0.68, 0.98),
+    'Pour_Point': (-82, 30),
+    'Wax': (0, 45),
     'Asphaltene': (0, 15),
-    'Viscosity_20C': (50, 1000),
-    'Viscosity_50C': (10, 200)
+    'Viscosity_20C': (0, 5500),
+    'Viscosity_50C': (0.4, 1160)
 }
 
 DESEMPENHO_MODELOS = {
