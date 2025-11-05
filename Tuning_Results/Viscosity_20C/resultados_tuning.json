@@ -1,29 +1,47 @@
 {
   "melhores_parametros": {
-    "tamanho_lote": 16,
+    "tamanho_lote": 32,
     "num_camadas": 2,
     "unidades_0": 512,
     "ativacao_0": "tanh",
-    "dropout_0": 0.22752447466384726,
+    "dropout_0": 0.23097950960028463,
     "batch_norm_0": false,
-    "unidades_1": 256,
-    "ativacao_1": "leaky_relu",
-    "dropout_1": 0.4192444722079106,
+    "unidades_1": 512,
+    "ativacao_1": "relu",
+    "dropout_1": 0.42916996858725887,
     "batch_norm_1": false,
-    "reg_l1": 0.0002539265554964262,
-    "reg_l2": 0.0005576390842363991,
+    "reg_l1": 2.236474408206667e-06,
+    "reg_l2": 1.8100436625872475e-06,
     "otimizador": "rmsprop",
-    "taxa_aprendizado": 0.00785383574166884
+    "taxa_aprendizado": 0.006816805963431236
   },
-  "melhor_pontuacao_validacao": 0.023324087692890315,
+  "melhor_pontuacao_validacao": 0.003855064243543893,
   "metricas_teste": {
-    "mse": 2342.010668525153,
-    "rmse": 48.39432475533834,
-    "mae": 32.073243166161376,
-    "r2": 0.8449547862713678,
-    "mape": 277.88454412223325,
-    "erro_maximo": 139.25268081351447,
-    "media_residuos": -14.94263488822647,
-    "desvio_residuos": 46.02964621982565,
-    "p_shapiro": 0.11854774415771474,
-    "residuos_normais": 
+    "mse": 4869.310250820407,
+    "rmse": 69.78044318303236,
+    "mae": 54.83383196784827,
+    "r2": 0.6621093816095791,
+    "mape": 1305.6129419857903,
+    "erro_maximo": 139.82839569091797,
+    "media_residuos": 34.66681448071468,
+    "desvio_residuos": 60.56007120686136,
+    "p_shapiro": 0.42705776028337383,
+    "residuos_normais": true
+  },
+  "nomes_caracteristicas": [
+    "Density",
+    "Pour_Point",
+    "Wax",
+    "Asphaltene",
+    "Viscosity_50C"
+  ],
+  "variaveis_removidas": [],
+  "atipicos_detectados": 0,
+  "num_tentativas": 500,
+  "info_conjunto_dados": {
+    "total_amostras": 103,
+    "amostras_desenvolvimento": 93,
+    "amostras_teste": 10,
+    "num_caracteristicas": 5
+  }
+}
