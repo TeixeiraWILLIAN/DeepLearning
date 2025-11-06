@@ -284,7 +284,7 @@ else:
         st.subheader("Detalhes do Erro de Carregamento:")
         # Display individual error messages
         for prop, error_msg in LOAD_STATUS.items():
-            st.warning(f"Propriedade {prop}: {error_msg}")
+            st.warning(f"Propriedade {prop}: {error_msg}")            
 
 # Footer
 st.markdown("---")
