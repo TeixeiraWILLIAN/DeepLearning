@@ -21,7 +21,9 @@ import tensorflow as tf
 import pandas as pd
 from pathlib import Path
 
-# CONFIGURATIONS AND FUNCTIONS FROM ITERATIVE_PREDICTION.py
+# ==============================================================================
+# CONFIGURAÇÕES E FUNÇÕES DO ITERATIVE_PREDICTION.py
+# ==============================================================================
 
 # SETTINGS
 PROPRIEDADES = ['Density', 'Pour_Point', 'Wax',
@@ -36,16 +38,16 @@ UNIDADES = {
 }
 
 RANGES_TIPICOS = {
-    'Density': (0.68, 0.98),
-    'Pour_Point': (-82, 30),
-    'Wax': (0, 45),
+    'Density': (0.75, 1.05),
+    'Pour_Point': (-40, 30),
+    'Wax': (0, 20),
     'Asphaltene': (0, 15),
-    'Viscosity_20C': (0, 5500),
-    'Viscosity_50C': (0.4, 1160)
+    'Viscosity_20C': (50, 1000),
+    'Viscosity_50C': (10, 200)
 }
 
-# Model performance (R²)
-# These values should be updated after the final tuning
+# Desempenho dos modelos (R²)
+# Estes valores devem ser atualizados após o tuning final
 DESEMPENHO_MODELOS = {
     'Density': 0.93,
     'Viscosity_20C': 0.97,
@@ -55,26 +57,39 @@ DESEMPENHO_MODELOS = {
     'Viscosity_50C': 0.91
 }
 
-# Path to models
-MODELS_FOLDER = 'Results_model'
+# --- CORREÇÃO DE CAMINHO ROBUSTA ---
+# Tenta encontrar a pasta 'Results_model' de forma robusta.
+# Isso é crucial para funcionar tanto localmente quanto no Streamlit Cloud.
+# O Path(os.getcwd()) garante que o caminho seja resolvido a partir do diretório de execução.
+MODELS_FOLDER = Path(os.getcwd()) / 'Results_model'
 
-# Dictionary to store model loading status
+# Se a pasta não for encontrada no diretório atual, tenta subir um nível (comum em ambientes virtuais)
+if not MODELS_FOLDER.exists():
+    MODELS_FOLDER = Path(os.getcwd()).parent / 'Results_model'
+
+# Converte para string para compatibilidade com as funções de carregamento
+MODELS_FOLDER = str(MODELS_FOLDER)
+# -----------------------------------
+
+# Dicionário para armazenar o status de carregamento
 LOAD_STATUS = {}
 
-# Cached loading functions for optimization
+# Funções de carregamento com cache para otimização
 
 
 @st.cache_resource
 def load_tf_model(propriedade):
-    """Loads the TensorFlow model."""
-    modelo_path = os.path.join(
-        MODELS_FOLDER, propriedade, f'modelo_{propriedade}.keras')
-    if not os.path.exists(modelo_path):
+    """Carrega o modelo do TensorFlow."""
+    # Usa Path para construir o caminho de forma segura
+    modelo_path = Path(MODELS_FOLDER) / propriedade / \
+        f'modelo_{propriedade}.keras'
+
+    if not modelo_path.exists():
         LOAD_STATUS[propriedade] = f"Modelo .keras não encontrado em: {modelo_path}"
         return None
     try:
-        # Streamlit handles model caching automatically
-        return tf.keras.models.load_model(modelo_path)
+        # O Streamlit lida com o cache do modelo do TensorFlow
+        return tf.keras.models.load_model(str(modelo_path))
     except Exception as e:
         LOAD_STATUS[propriedade] = f"Erro ao carregar modelo .keras: {e}"
         return None
@@ -82,13 +97,12 @@ def load_tf_model(propriedade):
 
 @st.cache_data
 def load_joblib_data(propriedade, suffix):
-    """Loads scalers and JSON columns with cached data."""
+    """Carrega os scalers e colunas com cache de dados."""
 
-    # Load column JSON file
+    # Lógica para carregar o arquivo JSON de colunas
     if suffix == 'colunas_entrada':
-        file_path = os.path.join(
-            MODELS_FOLDER, propriedade, 'colunas_entrada.json')
-        if not os.path.exists(file_path):
+        file_path = Path(MODELS_FOLDER) / propriedade / 'colunas_entrada.json'
+        if not file_path.exists():
             LOAD_STATUS[
                 propriedade] = f"Arquivo de colunas .json não encontrado em: {file_path}"
             return None
@@ -99,21 +113,21 @@ def load_joblib_data(propriedade, suffix):
             LOAD_STATUS[propriedade] = f"Erro ao carregar colunas .json: {e}"
             return None
 
-    # Load scaler .pkl files
-    file_path = os.path.join(MODELS_FOLDER, propriedade,
-                             f'{propriedade}_{suffix}.pkl')
-    if not os.path.exists(file_path):
+    # Lógica para carregar os scalers .pkl
+    file_path = Path(MODELS_FOLDER) / propriedade / \
+        f'{propriedade}_{suffix}.pkl'
+    if not file_path.exists():
         LOAD_STATUS[propriedade] = f"Scaler .pkl não encontrado em: {file_path}"
         return None
     try:
-        return joblib.load(file_path)
+        return joblib.load(str(file_path))
     except Exception as e:
         LOAD_STATUS[propriedade] = f"Erro ao carregar scaler .pkl: {e}"
         return None
 
 
 def carregar_modelo_completo(propriedade):
-    """Main function to load all model artifacts."""
+    """Função principal para carregar todos os artefatos do modelo."""
     LOAD_STATUS.clear()
     modelo = load_tf_model(propriedade)
     scaler_x = load_joblib_data(propriedade, 'normalizador_x')
@@ -127,42 +141,46 @@ def carregar_modelo_completo(propriedade):
 
 
 def fazer_predicao(modelo, scaler_x, scaler_y, valores_entrada, colunas_esperadas):
-    """Performs the prediction."""
+    """Realiza a predição."""
     try:
-        # Arrange input data in the correct order
+        # Prepara os dados na ordem correta.
         X = np.array([[valores_entrada[col] for col in colunas_esperadas]])
 
-        # Normalize
+        # Normaliza
         X_norm = scaler_x.transform(X)
 
-        # Predict
+        # Prediz
         y_pred_norm = modelo.predict(X_norm, verbose=0)
         y_pred = scaler_y.inverse_transform(y_pred_norm)
 
         return y_pred[0][0]
     except Exception as e:
-        st.error(f"Erro ao fazer predição: {str(e)}")
+        st.error(f"Erro ao fazer estimativa: {str(e)}")
         return None
 
-# STREAMLIT INTERFACE
+# ==============================================================================
+# INTERFACE STREAMLIT
+# ==============================================================================
 
 
-# Page configuration
+# Configuração da página
 st.set_page_config(
     page_title="ECOPANN",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Title and header
-st.title("Estimativa de Propriedades do Petróleo usando Redes Neurais Artificiais")
+# Título e Header
+st.title("Estimativa de Propriedades do Petróleo Bruto usando Redes Neurais Artificiais")
 st.markdown("---")
 
-# SIDEBAR: Property selection
+# ------------------------------------------------------------------------------
+# SIDEBAR: Seleção da Propriedade
+# ------------------------------------------------------------------------------
 with st.sidebar:
     st.header("Configuração da Estimativa")
 
-    # Target property selection
+    # Seleção da Propriedade Alvo
     propriedade_alvo = st.selectbox(
         "Selecione a Propriedade que deseja estimar:",
         options=PROPRIEDADES,
@@ -170,11 +188,11 @@ with st.sidebar:
             'Viscosity_50C') if 'Viscosity_50C' in PROPRIEDADES else 0
     )
 
-    # Load model
+    # Carregar modelo
     modelo, scaler_x, scaler_y, colunas_entrada = carregar_modelo_completo(
         propriedade_alvo)
 
-    # Display R² and confidence
+    # Exibir R² e Confiança
     if modelo is not None:
         r2 = DESEMPENHO_MODELOS.get(propriedade_alvo, 0.0)
 
@@ -193,21 +211,24 @@ with st.sidebar:
         st.metric(label="R² do Modelo", value=f"{r2:.4f}")
         st.markdown(f"Status: :{cor}[**{status}**]")
 
-# MAIN CONTENT: Data Input and Prediction
+
+# ------------------------------------------------------------------------------
+# MAIN CONTENT: Entrada de Dados e Predição
+# ------------------------------------------------------------------------------
 if modelo is not None:
 
-    # Expected input columns (all except target)
+    # Colunas de entrada esperadas (todas menos a alvo)
     colunas_entrada_esperadas = [
         col for col in colunas_entrada if col != propriedade_alvo]
 
-    st.header(f"Insira os Valores para Estimar  de **{propriedade_alvo}**")
+    st.header(f"Insira os Valores para Estimar de **{propriedade_alvo}**")
     st.markdown(
         f"A propriedade alvo será estimada em **{UNIDADES[propriedade_alvo]}**.")
     st.markdown("---")
 
     valores_entrada = {}
 
-    # Create input columns for layout
+    # Criar colunas para organizar os inputs
     num_cols = 2
     cols = st.columns(num_cols)
 
@@ -217,22 +238,20 @@ if modelo is not None:
         min_val, max_val = RANGES_TIPICOS.get(prop, (0.0, 100.0))
         unidade = UNIDADES.get(prop, '-')
 
-        # Use number_input for precision
+        # Usar number_input para maior precisão
         with cols[col_idx]:
             valor = st.number_input(
                 label=f"{prop} ({unidade})",
                 min_value=float(min_val),
                 max_value=float(max_val),
                 value=(min_val + max_val) / 2,
-                step=(max_val - min_val) / 100,  # Smaller step for precision
+                step=(max_val - min_val) / 100,  # Passo menor para precisão
                 format="%.4f",
                 help=f"Range típico: {min_val} a {max_val} {unidade}"
             )
             valores_entrada[prop] = valor
 
-    st.markdown("---")
-
-    # Prediction button
+    # Botão de Predição
     if st.button("Fazer Estimativa", type="primary", use_container_width=True):
 
         with st.spinner("Processando estimativa..."):
@@ -242,7 +261,9 @@ if modelo is not None:
 
         if predicao is not None:
 
-            # Display result
+            # ------------------------------------------------------------------
+            # Exibir Resultado
+            # ------------------------------------------------------------------
             st.success("Estimativa Concluída!")
 
             col_res, col_r2 = st.columns([2, 1])
@@ -255,26 +276,41 @@ if modelo is not None:
                 )
 
             with col_r2:
-                # Display R² and reliability again
+                # Re-exibir o R² e status para destaque
                 st.metric(label="R² do Modelo", value=f"{r2:.4f}")
                 st.info(f"Confiança: **{status}**")
 
             st.markdown("---")
-            st.subheader("Valores de Entrada Utilizados")
 
-            # Show input values as a DataFrame for clarity
+            st.subheader("Valores de entrada utilizados e valor estimado")
+
+            # Tabela ORIGINAL com valores de entrada
             df_entrada = pd.DataFrame(
                 {
-                    "Propriedade": valores_entrada.keys(),
+                    "Propriedade": list(valores_entrada.keys()),
                     "Valor": [f"{v:.4f}" for v in valores_entrada.values()],
                     "Unidade": [UNIDADES[p] for p in valores_entrada.keys()]
                 }
-            ).set_index("Propriedade")
+            )
 
-            st.dataframe(df_entrada, use_container_width=True)
+            # Criar linha adicional com a estimativa
+            df_estimado = pd.DataFrame(
+                {
+                    "Propriedade": [f"{propriedade_alvo} (Estimado)"],
+                    "Valor": [f"{predicao:.4f}"],
+                    "Unidade": [UNIDADES[propriedade_alvo]]
+                }
+            )
+
+            # Concatenar sem alterar a estrutura original
+            df_final = pd.concat([df_entrada, df_estimado], ignore_index=True)
+
+            # Mostrar tabela final
+            st.dataframe(df_final, use_container_width=True)
+
 
 else:
-    # Show detailed error if model loading fails
+    # Exibir erro detalhado se o modelo não carregar
     st.error(
         "Não foi possível carregar os modelos. Verifique a estrutura de arquivos.")
     st.info(
@@ -282,11 +318,20 @@ else:
 
     if LOAD_STATUS:
         st.subheader("Detalhes do Erro de Carregamento:")
-        # Display individual error messages
+        # Usamos st.warning para cada erro detalhado
         for prop, error_msg in LOAD_STATUS.items():
             st.warning(f"Propriedade {prop}: {error_msg}")
 
 # Footer
 st.markdown("---")
 st.markdown(
-    "Projeto de Deep Learning para Estimar Propriedades do Petróleo Bruto.")
+    "Projeto de Deep Learning para Estimativa de Propriedades do Petróleo Bruto. ADRADECIMENTOS...!")
+
+
+BASE = Path(__file__).parent
+logo1 = BASE / "figure" / "logo_geoenergia.png"
+logo2 = BASE / "figure" / "logo_petrobras.png"
+
+with st.sidebar:
+    st.image(str(logo1), width=3125)
+    st.image(str(logo2), width=3125)
