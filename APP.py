@@ -149,22 +149,22 @@ def fazer_predicao(modelo, scaler_x, scaler_y, valores_entrada, colunas_esperada
 
 # Page configuration
 st.set_page_config(
-    page_title="Predição de Propriedades do Petróleo",
+    page_title="ECOPANN",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # Title and header
-st.title("Predição de Propriedades do Petróleo Bruto")
+st.title("Estimativa de Propriedades do Petróleo usando Redes Neurais Artificiais")
 st.markdown("---")
 
 # SIDEBAR: Property selection
 with st.sidebar:
-    st.header("Configuração da Predição")
+    st.header("Configuração da Estimativa")
 
     # Target property selection
     propriedade_alvo = st.selectbox(
-        "Selecione a Propriedade a Predizer:",
+        "Selecione a Propriedade que deseja estimar:",
         options=PROPRIEDADES,
         index=PROPRIEDADES.index(
             'Viscosity_50C') if 'Viscosity_50C' in PROPRIEDADES else 0
@@ -200,9 +200,9 @@ if modelo is not None:
     colunas_entrada_esperadas = [
         col for col in colunas_entrada if col != propriedade_alvo]
 
-    st.header(f"Insira os Valores para Predizer **{propriedade_alvo}**")
+    st.header(f"Insira os Valores para Estimar  de **{propriedade_alvo}**")
     st.markdown(
-        f"A propriedade alvo será predita em **{UNIDADES[propriedade_alvo]}**.")
+        f"A propriedade alvo será estimada em **{UNIDADES[propriedade_alvo]}**.")
     st.markdown("---")
 
     valores_entrada = {}
@@ -233,9 +233,9 @@ if modelo is not None:
     st.markdown("---")
 
     # Prediction button
-    if st.button("Fazer Predição", type="primary", use_container_width=True):
+    if st.button("Fazer Estimativa", type="primary", use_container_width=True):
 
-        with st.spinner("Processando predição..."):
+        with st.spinner("Processando estimativa..."):
             predicao = fazer_predicao(
                 modelo, scaler_x, scaler_y, valores_entrada, colunas_entrada_esperadas
             )
@@ -243,13 +243,13 @@ if modelo is not None:
         if predicao is not None:
 
             # Display result
-            st.success("Predição Concluída!")
+            st.success("Estimativa Concluída!")
 
             col_res, col_r2 = st.columns([2, 1])
 
             with col_res:
                 st.metric(
-                    label=f"Valor Predito para {propriedade_alvo}",
+                    label=f"Valor Estimado para {propriedade_alvo}",
                     value=f"{predicao:.4f} {UNIDADES[propriedade_alvo]}",
                     delta=None
                 )
@@ -284,9 +284,9 @@ else:
         st.subheader("Detalhes do Erro de Carregamento:")
         # Display individual error messages
         for prop, error_msg in LOAD_STATUS.items():
-            st.warning(f"Propriedade {prop}: {error_msg}")            
+            st.warning(f"Propriedade {prop}: {error_msg}")
 
 # Footer
 st.markdown("---")
 st.markdown(
-    "Projeto de Deep Learning para Predição de Propriedades do Petróleo Bruto.")
+    "Projeto de Deep Learning para Estimar Propriedades do Petróleo Bruto.")
