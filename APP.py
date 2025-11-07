@@ -325,13 +325,15 @@ else:
 # Footer
 st.markdown("---")
 st.markdown(
-    "Projeto de Deep Learning para Estimativa de Propriedades do Petróleo Bruto. ADRADECIMENTOS...!")
+    "Este projeto de Deep Learning aplicado à estimativa de propriedades de petróleo bruto representa parte das atividades de pesquisa que venho desenvolvendo no Geoenergia Lab. Registro meus agradecimentos ao Prof. Dr. Luiz Adolfo Hegele Junior e ao Mestre Vinicius Czarnobay pelo apoio técnico, pelas contribuições científicas e pelo constante direcionamento durante o desenvolvimento deste estudo!")
 
 
 BASE = Path(__file__).parent
 logo1 = BASE / "figure" / "logo_geoenergia.png"
 logo2 = BASE / "figure" / "logo_petrobras.png"
+logo3 = BASE / "figure" / "logo_sintef.png"
 
 with st.sidebar:
     st.image(str(logo1), width=3125)
     st.image(str(logo2), width=3125)
+    st.image(str(logo3), width=3125)
