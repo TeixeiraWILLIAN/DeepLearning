@@ -57,18 +57,8 @@ DESEMPENHO_MODELOS = {
     'Viscosity_50C': 0.91
 }
 
-# --- CORREÇÃO DE CAMINHO ROBUSTA ---
-# Tenta encontrar a pasta 'Results_model' de forma robusta.
-# Isso é crucial para funcionar tanto localmente quanto no Streamlit Cloud.
-# O Path(os.getcwd()) garante que o caminho seja resolvido a partir do diretório de execução.
-MODELS_FOLDER = Path(os.getcwd()) / 'Results_model'
-
-# Se a pasta não for encontrada no diretório atual, tenta subir um nível (comum em ambientes virtuais)
-if not MODELS_FOLDER.exists():
-    MODELS_FOLDER = Path(os.getcwd()).parent / 'Results_model'
-
-# Converte para string para compatibilidade com as funções de carregamento
-MODELS_FOLDER = str(MODELS_FOLDER)
+BASE_DIR = Path(__file__).resolve().parent
+MODELS_FOLDER = BASE_DIR / "Results_model"
 # -----------------------------------
 
 # Dicionário para armazenar o status de carregamento
