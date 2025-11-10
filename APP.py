@@ -38,7 +38,7 @@ UNIDADES = {
 }
 
 RANGES_TIPICOS = {
-    'Density': (0.75, 0, 99),
+    'Density': (0.75, 0.99),
     'Pour_Point': (-90, 30),
     'Wax': (0, 50),
     'Asphaltene': (0, 15),
