@@ -237,7 +237,6 @@ if modelo is not None:
         """,
         unsafe_allow_html=True
     )
-    st.markdown("---")
 
     valores_entrada = {}
 
