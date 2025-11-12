@@ -28,6 +28,10 @@ from pathlib import Path
 # SETTINGS
 PROPRIEDADES = ['Density', 'Pour_Point', 'Wax',
                 'Asphaltene', 'Viscosity_20C', 'Viscosity_50C']
+
+DISPLAY_NAMES = {p: p.replace("_", " ").replace(
+    "20C", "20°C").replace("50C", "50°C") for p in PROPRIEDADES}
+
 UNIDADES = {
     'Density': 'kg/L',
     'Pour_Point': '°C',
@@ -145,7 +149,7 @@ def fazer_predicao(modelo, scaler_x, scaler_y, valores_entrada, colunas_esperada
 
         return y_pred[0][0]
     except Exception as e:
-        st.error(f"Erro ao fazer estimativa: {str(e)}")
+        st.error(f"Error during estimation: {str(e)}")
         return None
 
 # ==============================================================================
@@ -160,20 +164,33 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Título e Header
-st.title("Estimativa de Propriedades do Petróleo Bruto usando Redes Neurais Artificiais")
+# title
+st.markdown(
+    """
+    <div style='line-height: 1.2;'>
+        <h1 style='margin-bottom: 0px;'>
+            <strong><span style='color:#F36B5B;'>ECOPANN</span></strong>
+        </h1>
+        <p style='font-size:26px; font-weight:normal; margin-top:0px;'>
+            Estimation of Crude Oil Properties Using Artificial Neural Networks
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 st.markdown("---")
 
 # ------------------------------------------------------------------------------
 # SIDEBAR: Seleção da Propriedade
 # ------------------------------------------------------------------------------
 with st.sidebar:
-    st.header("Configuração da Estimativa")
+    st.header("Estimation Settings")
 
     # Seleção da Propriedade Alvo
     propriedade_alvo = st.selectbox(
-        "Selecione a Propriedade que deseja estimar:",
+        "Select the property you want to estimate:",
         options=PROPRIEDADES,
+        format_func=lambda x: DISPLAY_NAMES[x],
         index=PROPRIEDADES.index(
             'Viscosity_50C') if 'Viscosity_50C' in PROPRIEDADES else 0
     )
@@ -187,18 +204,18 @@ with st.sidebar:
         r2 = DESEMPENHO_MODELOS.get(propriedade_alvo, 0.0)
 
         if r2 > 0.90:
-            status = "Alta Confiabilidade"
+            status = "High Reliability"
             cor = "green"
         elif r2 > 0.50:
-            status = "Moderada Confiabilidade"
+            status = "Moderate Reliability"
             cor = "orange"
         else:
-            status = "Baixa Confiabilidade"
+            status = "Low Reliability"
             cor = "red"
 
         st.markdown("---")
-        st.subheader("Desempenho do Modelo")
-        st.metric(label="R² do Modelo", value=f"{r2:.4f}")
+        st.subheader("Model Performance")
+        st.metric(label="Model R²", value=f"{r2:.4f}")
         st.markdown(f"Status: :{cor}[**{status}**]")
 
 
@@ -211,9 +228,15 @@ if modelo is not None:
     colunas_entrada_esperadas = [
         col for col in colunas_entrada if col != propriedade_alvo]
 
-    st.header(f"Insira os Valores para Estimar de **{propriedade_alvo}**")
     st.markdown(
-        f"A propriedade alvo será estimada em **{UNIDADES[propriedade_alvo]}**.")
+        f"""
+        <h2>
+            Enter the values to estimate for 
+            <span style='color:#FA8072;'><strong>{DISPLAY_NAMES[propriedade_alvo]}</strong></span>
+        </h2>
+        """,
+        unsafe_allow_html=True
+    )
     st.markdown("---")
 
     valores_entrada = {}
@@ -231,20 +254,20 @@ if modelo is not None:
         # Usar number_input para maior precisão
         with cols[col_idx]:
             valor = st.number_input(
-                label=f"{prop} ({unidade})",
+                label=f"{DISPLAY_NAMES[prop]} ({unidade})",
                 min_value=float(min_val),
                 max_value=float(max_val),
                 value=(min_val + max_val) / 2,
                 step=(max_val - min_val) / 100,  # Passo menor para precisão
                 format="%.4f",
-                help=f"Range típico: {min_val} a {max_val} {unidade}"
+                help=f"Typical Range: {min_val} a {max_val} {unidade}"
             )
             valores_entrada[prop] = valor
 
     # Botão de Predição
-    if st.button("Fazer Estimativa", type="primary", use_container_width=True):
+    if st.button("Run Estimation", type="primary", use_container_width=True):
 
-        with st.spinner("Processando estimativa..."):
+        with st.spinner("Processing estimation..."):
             predicao = fazer_predicao(
                 modelo, scaler_x, scaler_y, valores_entrada, colunas_entrada_esperadas
             )
@@ -254,41 +277,41 @@ if modelo is not None:
             # ------------------------------------------------------------------
             # Exibir Resultado
             # ------------------------------------------------------------------
-            st.success("Estimativa Concluída!")
+            st.success("Estimation Completed!")
 
             col_res, col_r2 = st.columns([2, 1])
 
             with col_res:
                 st.metric(
-                    label=f"Valor Estimado para {propriedade_alvo}",
+                    label=f"Estimated Value for {DISPLAY_NAMES[propriedade_alvo]}",
                     value=f"{predicao:.4f} {UNIDADES[propriedade_alvo]}",
                     delta=None
                 )
 
             with col_r2:
                 # Re-exibir o R² e status para destaque
-                st.metric(label="R² do Modelo", value=f"{r2:.4f}")
-                st.info(f"Confiança: **{status}**")
+                st.metric(label="Model R²", value=f"{r2:.4f}")
+                st.info(f"Confidence Level: **{status}**")
 
             st.markdown("---")
 
-            st.subheader("Valores de entrada utilizados e valor estimado")
+            st.subheader("Input Data and Predicted Value")
 
             # Tabela ORIGINAL com valores de entrada
             df_entrada = pd.DataFrame(
                 {
-                    "Propriedade": list(valores_entrada.keys()),
-                    "Valor": [f"{v:.4f}" for v in valores_entrada.values()],
-                    "Unidade": [UNIDADES[p] for p in valores_entrada.keys()]
+                    "Property": list(valores_entrada.keys()),
+                    "Value": [f"{v:.4f}" for v in valores_entrada.values()],
+                    "Unit": [UNIDADES[p] for p in valores_entrada.keys()]
                 }
             )
 
             # Criar linha adicional com a estimativa
             df_estimado = pd.DataFrame(
                 {
-                    "Propriedade": [f"{propriedade_alvo} (Estimado)"],
-                    "Valor": [f"{predicao:.4f}"],
-                    "Unidade": [UNIDADES[propriedade_alvo]]
+                    "Property": [f"{DISPLAY_NAMES[propriedade_alvo]} (Estimated)"],
+                    "Value": [f"{predicao:.4f}"],
+                    "Unit": [UNIDADES[propriedade_alvo]]
                 }
             )
 
@@ -302,20 +325,24 @@ if modelo is not None:
 else:
     # Exibir erro detalhado se o modelo não carregar
     st.error(
-        "Não foi possível carregar os modelos. Verifique a estrutura de arquivos.")
+        "Could not load the models. Please check the file structure.")
     st.info(
-        f"O Streamlit está procurando os modelos na pasta: `{MODELS_FOLDER}`")
+        f"Streamlit is looking for the models in the folder: `{MODELS_FOLDER}`")
 
     if LOAD_STATUS:
-        st.subheader("Detalhes do Erro de Carregamento:")
+        st.subheader("Loading Error Details:")
         # Usamos st.warning para cada erro detalhado
         for prop, error_msg in LOAD_STATUS.items():
-            st.warning(f"Propriedade {prop}: {error_msg}")
+            st.warning(f"Property {prop}: {error_msg}")
 
 # Footer
 st.markdown("---")
 st.markdown(
-    "Este projeto de Deep Learning aplicado à estimativa de propriedades de petróleo bruto representa parte das atividades de pesquisa que venho desenvolvendo no Geoenergia Lab. Registro meus agradecimentos ao Prof. Dr. Luiz Adolfo Hegele Junior e ao Mestre Vinicius Czarnobay pelo apoio técnico, pelas contribuições científicas e pelo constante direcionamento durante o desenvolvimento deste estudo!")
+    "This Deep Learning project, applied to the estimation of crude oil properties, "
+    "represents part of the research activities I have been conducting at the Geoenergia Lab. "
+    "I express my gratitude to Prof. Dr. Luiz Adolfo Hegele Junior and MSc. Vinicius Czarnobay for their "
+    "technical support, scientific contributions, and continuous guidance throughout the development of this "
+    "study.")
 
 
 BASE = Path(__file__).parent
