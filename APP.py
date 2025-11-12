@@ -348,8 +348,10 @@ BASE = Path(__file__).parent
 logo1 = BASE / "figure" / "logo_geoenergia.png"
 logo2 = BASE / "figure" / "logo_petrobras.png"
 logo3 = BASE / "figure" / "logo_sintef.png"
+logo4 = BASE / "figure" / "udescc.png"
 
 with st.sidebar:
     st.image(str(logo1), width=3125)
     st.image(str(logo2), width=3125)
     st.image(str(logo3), width=3125)
+    st.image(str(logo4), width=3125)
