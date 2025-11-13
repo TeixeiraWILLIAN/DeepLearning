@@ -21,9 +21,7 @@ import tensorflow as tf
 import pandas as pd
 from pathlib import Path
 
-# ==============================================================================
-# CONFIGURAÇÕES E FUNÇÕES DO ITERATIVE_PREDICTION.py
-# ==============================================================================
+# SETTINGS AND FUNCTIONS OF ITERATIVE_PREDICTION.py
 
 # SETTINGS
 PROPRIEDADES = ['Density', 'Pour_Point', 'Wax',
@@ -50,8 +48,8 @@ RANGES_TIPICOS = {
     'Viscosity_50C': (0, 1200)
 }
 
-# Desempenho dos modelos (R²)
-# Estes valores devem ser atualizados após o tuning final
+# Model performance (R²)
+# These values must be updated after the final tuning
 DESEMPENHO_MODELOS = {
     'Density': 0.94,
     'Viscosity_20C': 0.98,
@@ -63,18 +61,18 @@ DESEMPENHO_MODELOS = {
 
 BASE_DIR = Path(__file__).resolve().parent
 MODELS_FOLDER = BASE_DIR / "Results_model"
-# -----------------------------------
 
-# Dicionário para armazenar o status de carregamento
+
+# Dictionary to store the loading status
 LOAD_STATUS = {}
 
-# Funções de carregamento com cache para otimização
+# Cached loading functions for optimization
 
 
 @st.cache_resource
 def load_tf_model(propriedade):
-    """Carrega o modelo do TensorFlow."""
-    # Usa Path para construir o caminho de forma segura
+    """Loads the TensorFlow model."""
+    # Uses Path to safely build the file path
     modelo_path = Path(MODELS_FOLDER) / propriedade / \
         f'modelo_{propriedade}.keras'
 
@@ -82,7 +80,7 @@ def load_tf_model(propriedade):
         LOAD_STATUS[propriedade] = f"Modelo .keras não encontrado em: {modelo_path}"
         return None
     try:
-        # O Streamlit lida com o cache do modelo do TensorFlow
+        # Streamlit handles the caching of the TensorFlow model
         return tf.keras.models.load_model(str(modelo_path))
     except Exception as e:
         LOAD_STATUS[propriedade] = f"Erro ao carregar modelo .keras: {e}"
@@ -91,9 +89,9 @@ def load_tf_model(propriedade):
 
 @st.cache_data
 def load_joblib_data(propriedade, suffix):
-    """Carrega os scalers e colunas com cache de dados."""
+    """Loads the scalers and column data using cache."""
 
-    # Lógica para carregar o arquivo JSON de colunas
+    # Logic to load the JSON file containing the input columns
     if suffix == 'colunas_entrada':
         file_path = Path(MODELS_FOLDER) / propriedade / 'colunas_entrada.json'
         if not file_path.exists():
@@ -107,7 +105,7 @@ def load_joblib_data(propriedade, suffix):
             LOAD_STATUS[propriedade] = f"Erro ao carregar colunas .json: {e}"
             return None
 
-    # Lógica para carregar os scalers .pkl
+    # Logic to load the .pkl scalers
     file_path = Path(MODELS_FOLDER) / propriedade / \
         f'{propriedade}_{suffix}.pkl'
     if not file_path.exists():
@@ -121,7 +119,7 @@ def load_joblib_data(propriedade, suffix):
 
 
 def carregar_modelo_completo(propriedade):
-    """Função principal para carregar todos os artefatos do modelo."""
+    """Main function to load all model artifacts."""
     LOAD_STATUS.clear()
     modelo = load_tf_model(propriedade)
     scaler_x = load_joblib_data(propriedade, 'normalizador_x')
@@ -135,12 +133,12 @@ def carregar_modelo_completo(propriedade):
 
 
 def fazer_predicao(modelo, scaler_x, scaler_y, valores_entrada, colunas_esperadas):
-    """Realiza a predição."""
+    """Performs the prediction."""
     try:
-        # Prepara os dados na ordem correta.
+        # Prepares the data in the correct order.
         X = np.array([[valores_entrada[col] for col in colunas_esperadas]])
 
-        # Normaliza
+        # Normalizes
         X_norm = scaler_x.transform(X)
 
         # Prediz
@@ -152,12 +150,11 @@ def fazer_predicao(modelo, scaler_x, scaler_y, valores_entrada, colunas_esperada
         st.error(f"Error during estimation: {str(e)}")
         return None
 
-# ==============================================================================
+
 # INTERFACE STREAMLIT
-# ==============================================================================
+# ===================
 
-
-# Configuração da página
+# Page configuration
 st.set_page_config(
     page_title="ECOPANN",
     layout="wide",
@@ -180,13 +177,11 @@ st.markdown(
 )
 st.markdown("---")
 
-# ------------------------------------------------------------------------------
-# SIDEBAR: Seleção da Propriedade
-# ------------------------------------------------------------------------------
+# SIDEBAR: Property Selection
 with st.sidebar:
     st.header("Estimation Settings")
 
-    # Seleção da Propriedade Alvo
+    # Target Property Selection
     propriedade_alvo = st.selectbox(
         "Select the property you want to estimate:",
         options=PROPRIEDADES,
@@ -195,11 +190,11 @@ with st.sidebar:
             'Viscosity_50C') if 'Viscosity_50C' in PROPRIEDADES else 0
     )
 
-    # Carregar modelo
+    # Load model
     modelo, scaler_x, scaler_y, colunas_entrada = carregar_modelo_completo(
         propriedade_alvo)
 
-    # Exibir R² e Confiança
+    # Display R² and Confidence
     if modelo is not None:
         r2 = DESEMPENHO_MODELOS.get(propriedade_alvo, 0.0)
 
@@ -219,12 +214,10 @@ with st.sidebar:
         st.markdown(f"Status: :{cor}[**{status}**]")
 
 
-# ------------------------------------------------------------------------------
-# MAIN CONTENT: Entrada de Dados e Predição
-# ------------------------------------------------------------------------------
+# MAIN CONTENT: Data Input and Prediction
 if modelo is not None:
 
-    # Colunas de entrada esperadas (todas menos a alvo)
+    # Expected input columns (all except the target)
     colunas_entrada_esperadas = [
         col for col in colunas_entrada if col != propriedade_alvo]
 
@@ -240,7 +233,7 @@ if modelo is not None:
 
     valores_entrada = {}
 
-    # Criar colunas para organizar os inputs
+    # Create columns to organize the inputs
     num_cols = 2
     cols = st.columns(num_cols)
 
@@ -250,20 +243,21 @@ if modelo is not None:
         min_val, max_val = RANGES_TIPICOS.get(prop, (0.0, 100.0))
         unidade = UNIDADES.get(prop, '-')
 
-        # Usar number_input para maior precisão
+        # Use number_input for greater precision
         with cols[col_idx]:
             valor = st.number_input(
                 label=f"{DISPLAY_NAMES[prop]} ({unidade})",
                 min_value=float(min_val),
                 max_value=float(max_val),
                 value=(min_val + max_val) / 2,
-                step=(max_val - min_val) / 100,  # Passo menor para precisão
+                # Smaller step size for precision
+                step=(max_val - min_val) / 100,
                 format="%.4f",
                 help=f"Typical Range: {min_val} a {max_val} {unidade}"
             )
             valores_entrada[prop] = valor
 
-    # Botão de Predição
+    # Prediction Button
     if st.button("Run Estimation", type="primary", use_container_width=True):
 
         with st.spinner("Processing estimation..."):
@@ -273,9 +267,7 @@ if modelo is not None:
 
         if predicao is not None:
 
-            # ------------------------------------------------------------------
-            # Exibir Resultado
-            # ------------------------------------------------------------------
+            # Display Result
             st.success("Estimation Completed!")
 
             col_res, col_r2 = st.columns([2, 1])
@@ -288,7 +280,7 @@ if modelo is not None:
                 )
 
             with col_r2:
-                # Re-exibir o R² e status para destaque
+                # Re-display R² and status for emphasis
                 st.metric(label="Model R²", value=f"{r2:.4f}")
                 st.info(f"Confidence Level: **{status}**")
 
@@ -296,7 +288,7 @@ if modelo is not None:
 
             st.subheader("Input Data and Predicted Value")
 
-            # Tabela ORIGINAL com valores de entrada
+            # ORIGINAL table with input values
             df_entrada = pd.DataFrame(
                 {
                     "Property": list(valores_entrada.keys()),
@@ -305,7 +297,7 @@ if modelo is not None:
                 }
             )
 
-            # Criar linha adicional com a estimativa
+            # Create additional row with the estimation
             df_estimado = pd.DataFrame(
                 {
                     "Property": [f"{DISPLAY_NAMES[propriedade_alvo]} (Estimated)"],
@@ -314,15 +306,15 @@ if modelo is not None:
                 }
             )
 
-            # Concatenar sem alterar a estrutura original
+            # Concatenate without modifying the original structure
             df_final = pd.concat([df_entrada, df_estimado], ignore_index=True)
 
-            # Mostrar tabela final
+            # Display final table
             st.dataframe(df_final, use_container_width=True)
 
 
 else:
-    # Exibir erro detalhado se o modelo não carregar
+    # Display detailed error if the model fails to load
     st.error(
         "Could not load the models. Please check the file structure.")
     st.info(
@@ -330,7 +322,7 @@ else:
 
     if LOAD_STATUS:
         st.subheader("Loading Error Details:")
-        # Usamos st.warning para cada erro detalhado
+        # We use st.warning for each detailed error
         for prop, error_msg in LOAD_STATUS.items():
             st.warning(f"Property {prop}: {error_msg}")
 

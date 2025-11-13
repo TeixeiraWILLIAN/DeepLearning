@@ -69,7 +69,7 @@ DESEMPENHO_MODELOS = {
 MODELS_FOLDER = 'Results_model'
 
 
-# FUNÇÕES
+# FUNCTIONS
 
 def limpar_tela():
     """Clears the console screen"""
@@ -218,19 +218,19 @@ def exibir_resultado(propriedade_alvo, predicao, valores_entrada, r2):
 
     # Model performance
     if r2 > 0.90:
-        cor = "\033[92m"  # Verde
+        cor = "\033[92m"  # Green
         status = "Altamente Confiável"
         confianca = "Alta"
     elif r2 > 0.50:
-        cor = "\033[93m"  # Amarelo
+        cor = "\033[93m"  # Yellow
         status = "Moderadamente Confiável"
         confianca = "Moderada"
     else:
-        cor = "\033[91m"  # Vermelho
+        cor = "\033[91m"  # Red
         status = "Baixa Confiabilidade"
         confianca = "Baixa"
 
-    reset = "\033[0m"  # Resetar cor
+    reset = "\033[0m"  # Color reset
 
     print(f"Desempenho do Modelo (R²): {r2:.4f}")
     print(f"Status: {cor}{status}{reset}")
@@ -258,7 +258,7 @@ def perguntar_continuar():
             print("Digite 's' para sim ou 'n' para não.\n")
 
 
-# PROGRAMA PRINCIPAL
+# MAIN PROGRAM
 
 def main():
     """Main function"""

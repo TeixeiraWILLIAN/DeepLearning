@@ -313,9 +313,9 @@ def executar_modelo_otimizado(
     X_desenvolvimento, X_teste, y_desenvolvimento, y_teste = train_test_split(
         X, y, test_size=0.09, random_state=SEMENTE
     )
-    #print(f"Desenvolvimento: {len(X_desenvolvimento)} amostras")
-    #print(f"Teste: {len(X_teste)} amostras")
-    print(f"Valores do conjunto teste usado: {y_teste}")
+    print(f"Desenvolvimento: {len(X_desenvolvimento)} amostras")
+    print(f"Teste: {len(X_teste)} amostras")
+    # print(f"Valores do conjunto teste usado: {y_teste}")
 
     # K-FOLD CROSS-VALIDATION
     print(f"\nVALIDAÇÃO CRUZADA K-FOLD (k=5)")
