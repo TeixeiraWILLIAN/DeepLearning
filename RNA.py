@@ -124,7 +124,7 @@ configuracoes_predefinidas = {
 # MAIN CONFIGURATION
 COLUNAS = ["Density", "Pour_Point", "Wax",
            "Asphaltene", "Viscosity_20C", "Viscosity_50C"]
-VARIAVEL = "Pour_Point"
+VARIAVEL = "Viscosity_50C"
 
 # Utilities
 
@@ -426,7 +426,7 @@ def executar_modelo_otimizado(
 
     # Final loss curve
     plt.figure(figsize=(10, 6))
-    plt.plot(historico.history['loss'])
+    plt.plot(historico.history['loss'], color='gray')
     plt.yscale('log')
     plt.xlabel('Épocas')
     plt.ylabel('Perda')
@@ -438,20 +438,41 @@ def executar_modelo_otimizado(
     plt.close()
 
     # Predictions vs Observations
-    plt.figure(figsize=(10, 8))
-    plt.scatter(y_teste, y_pred, alpha=0.7, color='blue')
-    valor_min = min(np.min(y_teste), np.min(y_pred))
-    valor_max = max(np.max(y_teste), np.max(y_pred))
-    plt.plot([valor_min, valor_max], [valor_min, valor_max], 'r--', lw=2)
-    plt.xlabel('Valores Observados')
-    plt.ylabel('Valores Preditos')
-    plt.title(f'{alvo} - Predições vs Observações (Teste)')
-    plt.grid(True, alpha=0.3)
-    plt.text(0.05, 0.95, f'R² = {metricas_teste["r2"]:.4f}', transform=plt.gca().transAxes,
-             bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
+    plt.figure(figsize=(8, 8))  # Alterado para quadrado (padrão técnico para plot x=y)
+
+    # Scatter com borda preta (edgecolor) destaca melhor os pontos impressos
+    plt.scatter(y_teste, y_pred, alpha=0.6, color='green', edgecolor='k', s=50, label='Dados')
+
+    # Definição de limites unificados para garantir a escala exata de 45 graus
+    v_min = min(np.min(y_teste), np.min(y_pred))
+    v_max = max(np.max(y_teste), np.max(y_pred))
+    margem = (v_max - v_min) * 0.05
+    limites = [v_min - margem, v_max + margem]
+
+    # Linha de identidade (preto tracejado é mais sóbrio para artigos)
+    plt.plot(limites, limites, 'k--', lw=2, label='Ideal (1:1)')
+
+    # Labels e Título com formatação matemática (MathText)
+    plt.xlabel(r'Valores Observados ($y_{obs}$)', fontsize=12)
+    plt.ylabel(r'Valores Preditos ($y_{pred}$)', fontsize=12)
+    plt.title(f'{alvo}', fontsize=14, pad=10)
+
+    # Forçar eixos idênticos
+    plt.xlim(limites)
+    plt.ylim(limites)
+
+    plt.grid(True, linestyle=':', alpha=0.6)
+    plt.legend(loc='lower right')  # Legenda ajuda a identificar a linha de referência
+
+    # Caixa de texto estilizada
+    plt.text(0.05, 0.95, f'$R^2$ = {metricas_teste["r2"]:.4f}', transform=plt.gca().transAxes,
+             fontsize=12, verticalalignment='top',
+             bbox=dict(boxstyle='round,pad=0.5', facecolor='white', alpha=0.9, edgecolor='g'))
+
     plt.tight_layout()
+    # DPI 600 é o padrão ouro para publicações (evita serrilhado)
     plt.savefig(os.path.join(caminho, 'predicoes_vs_observacoes.png'),
-                dpi=300, bbox_inches='tight')
+                dpi=600, bbox_inches='tight')
     plt.close()
 
     # Save input columns

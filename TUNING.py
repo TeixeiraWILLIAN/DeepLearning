@@ -58,8 +58,7 @@ tf.keras.utils.set_random_seed(SEMENTE)
 np.random.seed(SEMENTE)
 
 # MAIN CONFIGURATION
-COLUNAS = ["Density", "Pour_Point", "Wax",
-           "Asphaltene", "Viscosity_20C", "Viscosity_50C"]
+COLUNAS = ["Density", "Pour_Point", "Wax", "Asphaltene", "Viscosity_20C", "Viscosity_50C"]
 VARIAVEL = "Viscosity_20C"
 FOLDS = 5
 TENTATIVAS = 500
