@@ -189,7 +189,7 @@ def carregar_dados(caminho, alvo):
     X = df[colunas_caracteristicas].values
     y = df[[alvo]].values
 
-    # Returns empty values ​​for removed_variables and atypical_masks, as in TUNING.py when commented out.
+    # Returns empty values for removed variables and atypical masks, as in TUNING.py when commented out.
     return X, y, colunas_caracteristicas, [], None
 
 # Gets the configuration for the target variable
