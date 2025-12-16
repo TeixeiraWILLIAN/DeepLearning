@@ -1,6 +1,9 @@
-streamlit
-tensorflow
 numpy
 pandas
+tensorflow
 joblib
+optuna
+matplotlib
 scikit-learn
+scipy
+streamlit
