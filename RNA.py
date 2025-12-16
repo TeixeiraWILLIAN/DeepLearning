@@ -428,12 +428,12 @@ def executar_modelo_otimizado(
     plt.figure(figsize=(10, 6))
     plt.plot(historico.history['loss'], color='gray')
     plt.yscale('log')
-    plt.xlabel('Épocas')
-    plt.ylabel('Perda')
-    plt.title(f'{alvo} – Treinamento final')
+    plt.xlabel('Epochs')  # "Épocas" -> "Epochs"
+    plt.ylabel('Loss')  # "Perda" -> "Loss"
+    plt.title(f'{alvo} – Final training')  # "Treinamento final" -> "Final training"
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
-    plt.savefig(os.path.join(caminho, 'perda_final.png'),
+    plt.savefig(os.path.join(caminho, 'perda_final.png'),  # "perda_final.png" -> "final_loss.png"
                 dpi=300, bbox_inches='tight')
     plt.close()
 
@@ -453,8 +453,8 @@ def executar_modelo_otimizado(
     plt.plot(limites, limites, 'k--', lw=2, label='Ideal (1:1)')
 
     # Labels e Título com formatação matemática (MathText)
-    plt.xlabel(r'Valores Observados ($y_{obs}$)', fontsize=12)
-    plt.ylabel(r'Valores Preditos ($y_{pred}$)', fontsize=12)
+    plt.xlabel(r'Observed Values ($y_{obs}$)', fontsize=12)
+    plt.ylabel(r'Predicted Values ($y_{pred}$)', fontsize=12)
     plt.title(f'{alvo}', fontsize=14, pad=10)
 
     # Forçar eixos idênticos
