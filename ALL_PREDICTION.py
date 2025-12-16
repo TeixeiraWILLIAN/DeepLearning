@@ -34,13 +34,18 @@ Dependencies: TensorFlow, NumPy, Pandas, Joblib, JSON, OpenPyXL, Logging, OS
 =======================================================================
 """
 
+# ==========================================================
+# 📦 IMPORTS
+# ==========================================================
 import os
 import logging
 import pandas as pd
 import joblib
 import tensorflow as tf
 
-# MAIN CONFIGURATION
+# =========================================================
+# ⚙️ MAIN CONFIGURATION
+# =========================================================
 # Change here to the property you want to predict.
 # Options: 'Density', 'Pour_Point', 'Wax', 'Asphaltene', 'Viscosity_20C', 'Viscosity_50C'.
 # Use 'all' to run the prediction for all properties.

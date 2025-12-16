@@ -35,6 +35,9 @@ Dependencies: TensorFlow, NumPy, Pandas, Optuna, Scikit-learn, Matplotlib, SciPy
 =======================================================================
 """
 
+# ==========================================================
+# 📦 IMPORTS
+# ==========================================================
 import numpy as np
 import pandas as pd
 import tensorflow as tf
@@ -57,15 +60,15 @@ SEMENTE = 42
 tf.keras.utils.set_random_seed(SEMENTE)
 np.random.seed(SEMENTE)
 
-# MAIN CONFIGURATION
+# =========================================================
+# ⚙️ MAIN CONFIGURATION
+# =========================================================
 COLUNAS = ["Density", "Pour_Point", "Wax", "Asphaltene", "Viscosity_20C", "Viscosity_50C"]
 VARIAVEL = "Viscosity_20C"
 FOLDS = 5
 TENTATIVAS = 500
 
 # FUNCTION TO CONVERT NUMPY TYPES TO NATIVE PYTHON TYPES
-
-
 def converter_para_json_serializavel(obj):
     """Converts NumPy types and other non-serializable types to native Python types"""
     if isinstance(obj, dict):
@@ -88,8 +91,6 @@ def converter_para_json_serializavel(obj):
         return obj
 
 # Auxiliary Functions
-
-
 def detectar_valores_atipicos(X, y, contaminacao=0.1):
     """Detecta valores atípicos usando Isolation Forest"""
     dados = np.column_stack([X, y.reshape(-1, 1)])
@@ -121,8 +122,6 @@ def tratar_multicolinearidade(X, nomes_variaveis, limite=0.95):
     return X, nomes_variaveis, []
 
 # DATA LOADING
-
-
 def carregar_dados(caminho, alvo):
     """Loads and preprocesses the data"""
     if not os.path.exists(caminho):
@@ -160,8 +159,6 @@ def carregar_dados(caminho, alvo):
     return X, y, colunas_caracteristicas, [], None
 
 # OBJECTIVE FUNCTION FOR OPTUNA
-
-
 def construir_modelo(tentativa, dimensao_entrada):
     """Builds model with expanded search space"""
     modelo = tf.keras.Sequential(
@@ -314,8 +311,6 @@ def avaliacao_abrangente(y_verdadeiro, y_predito):
     }
 
 # TUNING PIPELINE AND FINAL TRAINING
-
-
 def executar_tuning(
         alvo,
         dados="oil_prop_database.xlsx",
@@ -368,7 +363,6 @@ def executar_tuning(
     y_dev_norm = normalizador_y.fit_transform(y_desenvolvimento)
 
     # Auxiliary class for building the model with the best fixed parameters
-
     class TrialFixo:
         def __init__(self, params):
             self.params = params
@@ -466,7 +460,9 @@ def executar_tuning(
     return resultados
 
 
-# MAIN
+# ==========================================================
+# 🚀 MAIN WORKFLOW
+# ==========================================================
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(
         description="Tuning avançado de hiperparâmetros para RNA")

@@ -12,6 +12,9 @@ Python Version: 3.10+
 Dependencies: Streamlit, os, json, joblib, numpy, tensorflow, pandas e pathlib
 """
 
+# ==========================================================
+# 📦 IMPORTS
+# ==========================================================
 import streamlit as st
 import os
 import json
@@ -21,9 +24,9 @@ import tensorflow as tf
 import pandas as pd
 from pathlib import Path
 
-# SETTINGS AND FUNCTIONS OF ITERATIVE_PREDICTION.py
-
-# SETTINGS
+# ============================================
+# ⚙️ DEFAULT SETTINGS (by property)
+# ============================================
 PROPRIEDADES = ['Density', 'Pour_Point', 'Wax',
                 'Asphaltene', 'Viscosity_20C', 'Viscosity_50C']
 
@@ -150,7 +153,7 @@ def fazer_predicao(modelo, scaler_x, scaler_y, valores_entrada, colunas_esperada
         st.error(f"Error during estimation: {str(e)}")
         return None
 
-
+# ===================
 # INTERFACE STREAMLIT
 # ===================
 

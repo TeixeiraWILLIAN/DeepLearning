@@ -37,6 +37,9 @@ Dependencies: TensorFlow, NumPy, Pandas, Scikit-learn, Matplotlib, SciPy, Joblib
 =======================================================================
 """
 
+# ==========================================================
+# 📦 IMPORTS
+# ==========================================================
 import numpy as np
 import pandas as pd
 import tensorflow as tf
@@ -57,7 +60,8 @@ SEMENTE = 42
 tf.keras.utils.set_random_seed(SEMENTE)
 np.random.seed(SEMENTE)
 
-# DEFAULT SETTINGS (by property)
+# ============================================
+# ⚙️ DEFAULT SETTINGS (by property)
 # ============================================
 configuracoes_predefinidas = {
     'Density': dict(
@@ -121,14 +125,14 @@ configuracoes_predefinidas = {
     )
 }
 
-# MAIN CONFIGURATION
+# =========================================================
+# ⚙️ MAIN CONFIGURATION
+# =========================================================
 COLUNAS = ["Density", "Pour_Point", "Wax",
            "Asphaltene", "Viscosity_20C", "Viscosity_50C"]
 VARIAVEL = "Viscosity_50C"
 
 # Utilities
-
-
 def converter_para_json_serializavel(obj):
     if isinstance(obj, dict):
         return {k: converter_para_json_serializavel(v) for k, v in obj.items()}
@@ -193,8 +197,6 @@ def carregar_dados(caminho, alvo):
     return X, y, colunas_caracteristicas, [], None
 
 # Gets the configuration for the target variable
-
-
 def obter_configuracao(alvo):
     """
     Retrieves the target variable configuration in the new format (layers=[(...), ...]).
@@ -206,8 +208,6 @@ def obter_configuracao(alvo):
             f"Configuração predefinida não encontrada para a variável alvo: {alvo}")
 
 # Model builder with fixed parameters
-
-
 def construir_modelo_otimizado(params, dimensao_entrada):
     """
     Builds the neural network model based on the provided parameters.
@@ -504,6 +504,9 @@ def executar_modelo_otimizado(
     return metricas_teste
 
 
+# ==========================================================
+# 🚀 MAIN WORKFLOW
+# ==========================================================
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Executa o modelo de rede neural com hiperparâmetros específicos por propriedade.")

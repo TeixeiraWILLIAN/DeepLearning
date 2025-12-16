@@ -29,6 +29,9 @@ Dependencies: TensorFlow, NumPy, joblib, json, os
 ===============================================================
 """
 
+# ==========================================================
+# 📦 IMPORTS
+# ==========================================================
 import os
 import json
 import joblib
@@ -36,7 +39,9 @@ import numpy as np
 import tensorflow as tf
 from pathlib import Path
 
-# SETTINGS
+# =========================================================
+# ⚙️ MAIN CONFIGURATION
+# =========================================================
 PROPRIEDADES = ['Density', 'Pour_Point', 'Wax',
                 'Asphaltene', 'Viscosity_20C', 'Viscosity_50C']
 UNIDADES = {
@@ -319,7 +324,9 @@ def main():
         limpar_tela()
         exibir_header()
 
-
+# ==========================================================
+# 🚀 MAIN WORKFLOW
+# ==========================================================
 if __name__ == "__main__":
     try:
         main()
