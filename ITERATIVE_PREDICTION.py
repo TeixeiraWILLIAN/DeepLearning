@@ -241,7 +241,7 @@ def exibir_resultado(propriedade_alvo, predicao, valores_entrada, r2):
     print(f"Status: {cor}{status}{reset}")
     print(f"Confiança Estimada: {cor}{confianca}{reset}\n")
 
-    # Input values ​​used
+    # Input values used
     print("Valores de Entrada Utilizados:")
     print("-" * 70)
     for prop, valor in valores_entrada.items():
