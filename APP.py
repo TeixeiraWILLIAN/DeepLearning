@@ -155,7 +155,7 @@ def fazer_predicao(modelo, scaler_x, scaler_y, valores_entrada, colunas_esperada
 
 # ===================
 # INTERFACE STREAMLIT
-# ===================
+# ==================
 
 # Page configuration
 st.set_page_config(
