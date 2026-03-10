@@ -1,28 +1,29 @@
-# EcoPann
+# EcopAnn
 
-Aplicação web desenvolvida para análise e visualização de dados utilizando Python e Streamlit.
+Web application developed for data analysis and visualization using Python and Streamlit.
 
 ## Live App
-Acesse a aplicação online:
+
+Access the deployed application:
 
 https://ecopann.streamlit.app
 
-## Tecnologias utilizadas
+## Technologies
 
 - Python 3.12
 - Streamlit
 - Pandas
 - Openpyxl
 
-## Requisitos
+## Requirements
 
-- Python 3.12
+- Python 3.12 or higher
 - pip
 
-## Instalação
+## Installation
 
-Clone o repositório:
+Clone the repository:
 
 ```bash
-git clone https://github.com/seu-usuario/ecopann.git
+git clone https://github.com/your-username/ecopann.git
 cd ecopann
