@@ -17,8 +17,8 @@ https://ecopann.streamlit.app
 
 ## Requirements
 
-- Python 3.12 or higher
-- pip
+- Python 3.12
+- pip install requirements.txt
 
 ## Installation
 
