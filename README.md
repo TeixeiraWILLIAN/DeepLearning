@@ -25,5 +25,5 @@ https://ecopann.streamlit.app
 Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/ecopann.git
+git clone https://github.com/teixeiraWILLIAN/ecopann.git
 cd ecopann
