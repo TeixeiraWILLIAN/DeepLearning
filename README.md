@@ -232,20 +232,6 @@ Possible future developments include:
 
 ---
 
-# Authors
-
-Willian Teixeira  
-Vinicius Czarnobay  
-Luiz A. Hegele Jr.
-
-Department of Petroleum Engineering  
-Santa Catarina State University (UDESC)  
-Balneário Camboriú — Brazil  
-
-Geoenergia Lab
-
----
-
 # License
 
 This project is intended for **research and educational purposes**.
