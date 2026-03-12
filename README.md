@@ -122,6 +122,7 @@ Clone the repository:
 ```bash
 git clone https://github.com/teixeirawILLIAN/ecopann.git
 cd ecopann
+```
 
 Recommended Python version:
 
@@ -129,27 +130,122 @@ Python 3.12
 
 Create a virtual environment (recommended):
 
+```bash
 python -m venv venv
+```
 
 Activate the virtual environment.
 
 Linux / Mac:
 
+```bash
 source venv/bin/activate
+```
 
 Windows:
 
+```bash
 venv\Scripts\activate
+```
 
 Install the required dependencies:
 
+```bash
 pip install -r requirements.txt
-Running the Application
+```
+
+---
+
+# Running the Application
 
 Run the Streamlit application:
 
+```bash
 streamlit run app.py
+```
 
 After running the command, open the browser at:
 
+```
 http://localhost:8501
+```
+
+---
+
+# Project Structure
+
+Typical repository structure:
+
+```
+ecopann
+│
+├── app.py
+├── model
+│   └── trained_model.h5
+│
+├── data
+│
+├── src
+│   ├── preprocessing.py
+│   ├── prediction.py
+│
+├── notebooks
+│
+├── requirements.txt
+├── README.md
+```
+
+Description:
+
+| Folder | Description |
+|------|-------------|
+| `app.py` | Streamlit application interface |
+| `model/` | Trained neural network models |
+| `data/` | Dataset files |
+| `src/` | Data preprocessing and prediction scripts |
+| `notebooks/` | Development notebooks |
+| `requirements.txt` | Project dependencies |
+
+---
+
+# Research Context
+
+This project was developed within the **Geoenergia Lab** at **Santa Catarina State University (UDESC)**.
+
+Research focus includes:
+
+- Machine Learning applied to Petroleum Engineering
+- Prediction of crude oil physicochemical properties
+- Data-driven modeling of petroleum fluids
+
+---
+
+# Future Improvements
+
+Possible future developments include:
+
+- Expanding the dataset with additional crude oil samples
+- Implementing deeper neural network architectures
+- Adding uncertainty quantification
+- Integrating additional petroleum fluid properties
+- Deploying an API for industrial integration
+
+---
+
+# Authors
+
+Willian Teixeira  
+Vinicius Czarnobay  
+Luiz A. Hegele Jr.
+
+Department of Petroleum Engineering  
+Santa Catarina State University (UDESC)  
+Balneário Camboriú — Brazil  
+
+Geoenergia Lab
+
+---
+
+# License
+
+This project is intended for **research and educational purposes**.
