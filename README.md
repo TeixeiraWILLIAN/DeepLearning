@@ -86,10 +86,11 @@ Oil samples include data from companies such as:
 Available properties include examples such as:
 
 - Density
-- Viscosity
+- Pour point
 - Wax content
 - Asphaltene content
-- Pour point
+- Viscosity at 20 °C
+- Viscosity at 50 °C
 
 These properties are used as **inputs or targets** depending on the prediction task.
 
