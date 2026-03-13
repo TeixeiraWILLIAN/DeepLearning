@@ -1,7 +1,7 @@
-# ECO-PANN
+# ECOP-ANN
 ### Estimation of Crude Oil Properties Using Artificial Neural Networks
 
-ECO-PANN is a machine learning application designed to estimate **physicochemical properties of crude oil** using **Artificial Neural Networks (ANNs)**.
+ECOP-ANN is a machine learning application designed to estimate **physicochemical properties of crude oil** using **Artificial Neural Networks (ANNs)**.
 
 The system combines **data preprocessing, neural network prediction, and an interactive web interface** built with **Streamlit**, allowing users to estimate oil properties directly through a browser.
 
