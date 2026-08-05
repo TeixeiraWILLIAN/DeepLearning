@@ -472,7 +472,7 @@ def executar_modelo_otimizado(
     plt.tight_layout()
     # DPI 600 é o padrão ouro para publicações (evita serrilhado)
     plt.savefig(os.path.join(caminho, 'predicoes_vs_observacoes.png'),
-                dpi=600, bbox_inches='tight')
+                dpi=300, bbox_inches='tight')
     plt.close()
 
     # Save input columns
