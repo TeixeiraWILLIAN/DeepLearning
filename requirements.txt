@@ -7,3 +7,4 @@ matplotlib
 scikit-learn
 scipy
 streamlit
+starlette<=0.35.0
