@@ -130,7 +130,7 @@ configuracoes_predefinidas = {
 # =========================================================
 COLUNAS = ["Density", "Pour_Point", "Wax",
            "Asphaltene", "Viscosity_20C", "Viscosity_50C"]
-VARIAVEL = "Viscosity_50C"
+VARIAVEL = "Wax"  # Default target variable for execution
 
 # Utilities
 def converter_para_json_serializavel(obj):
@@ -450,12 +450,12 @@ def executar_modelo_otimizado(
     limites = [v_min - margem, v_max + margem]
 
     # Linha de identidade (preto tracejado é mais sóbrio para artigos)
-    plt.plot(limites, limites, 'k--', lw=2, label='Ideal (1:1)')
+    plt.plot(limites, limites, 'k--', lw=2, label='(1:1)')
 
     # Labels e Título com formatação matemática (MathText)
-    plt.xlabel(r'Observed Values ($y_{obs}$)', fontsize=12)
-    plt.ylabel(r'Predicted Values ($y_{pred}$)', fontsize=12)
-    plt.title(f'{alvo}', fontsize=14, pad=10)
+    plt.xlabel(r'Valores Observados ($y_{obs}$)', fontsize=12)
+    plt.ylabel(r'Valores Estimados ($y_{est}$)', fontsize=12)
+    #plt.title(f'{alvo}', fontsize=14, pad=10)
 
     # Forçar eixos idênticos
     plt.xlim(limites)
